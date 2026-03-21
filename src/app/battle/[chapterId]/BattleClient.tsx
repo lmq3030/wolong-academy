@@ -11,15 +11,14 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
   const engine = useLevelEngine(chapter);
 
   const handleNextPhase = () => {
-    if (engine.state.phase === 'rewards') {
-      // Save progress to localStorage (the source of truth for MVP)
+    if (engine.state.phase === 'victory') {
+      // Save progress and navigate on first "继续" click (no separate rewards phase)
       saveChapterProgress(chapter.id, engine.state.stars);
       addXP(chapter.rewards.xp);
       if (chapter.rewards.unlockGenerals) {
         unlockGenerals(chapter.rewards.unlockGenerals);
       }
 
-      // Also fire API call for future DB persistence
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

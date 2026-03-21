@@ -214,13 +214,10 @@ describe('BattleScene', () => {
     expect(onUseHint).toHaveBeenCalledTimes(1);
   });
 
-  it('challenge prompt text is displayed', () => {
+  it('challenge prompt text is displayed via editor', () => {
     render(<BattleScene {...defaultProps} phase="challenge" />);
-    // Prompt appears both in the prompt bar and inside the mocked editor
-    const elements = screen.getAllByText('使用 print() 输出你的名字');
-    expect(elements.length).toBeGreaterThanOrEqual(1);
-    // The first match should be the prompt bar <p> element
-    expect(elements[0].tagName).toBe('P');
+    // Prompt is rendered inside the mocked CodeEditorSwitch
+    expect(screen.getByText('使用 print() 输出你的名字')).toBeInTheDocument();
   });
 
   it('shows hint text when currentHint is provided', () => {

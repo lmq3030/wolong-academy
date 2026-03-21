@@ -134,8 +134,8 @@ describe('BattleClient', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
-  it('on rewards phase, handleNextPhase saves progress to localStorage before navigating', () => {
-    setupEngine('rewards');
+  it('on victory phase, handleNextPhase saves progress to localStorage before navigating', () => {
+    setupEngine('victory');
     render(<BattleClient chapter={mockChapter} />);
 
     fireEvent.click(screen.getByTestId('battle-scene'));
@@ -146,8 +146,8 @@ describe('BattleClient', () => {
     expect(pushMock).toHaveBeenCalledWith('/map');
   });
 
-  it('on rewards phase, does not call engine.nextPhase', () => {
-    setupEngine('rewards');
+  it('on victory phase, does not call engine.nextPhase', () => {
+    setupEngine('victory');
     render(<BattleClient chapter={mockChapter} />);
 
     fireEvent.click(screen.getByTestId('battle-scene'));
@@ -155,8 +155,8 @@ describe('BattleClient', () => {
     expect(nextPhaseMock).not.toHaveBeenCalled();
   });
 
-  it('calls fetch /api/progress on rewards phase', () => {
-    setupEngine('rewards');
+  it('calls fetch /api/progress on victory phase', () => {
+    setupEngine('victory');
     render(<BattleClient chapter={mockChapter} />);
 
     fireEvent.click(screen.getByTestId('battle-scene'));
@@ -174,8 +174,8 @@ describe('BattleClient', () => {
     });
   });
 
-  it('navigates to /map after saving on rewards phase', () => {
-    setupEngine('rewards');
+  it('navigates to /map after saving on victory phase', () => {
+    setupEngine('victory');
     render(<BattleClient chapter={mockChapter} />);
 
     fireEvent.click(screen.getByTestId('battle-scene'));
@@ -191,7 +191,7 @@ describe('BattleClient', () => {
       ...mockChapter,
       rewards: { xp: 100 },
     };
-    const engineReturn = setupEngine('rewards');
+    const engineReturn = setupEngine('victory');
     // Override rewards to have no unlockGenerals
     engineReturn.rewards = { xp: 100 };
     mockUseLevelEngine.mockReturnValue(engineReturn);

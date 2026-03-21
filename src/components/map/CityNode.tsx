@@ -59,8 +59,8 @@ export function CityNode({ chapter, status, stars = 0, x, y }: CityNodeProps) {
           fill="none"
           stroke="var(--color-gold)"
           strokeWidth={2}
-          initial={{ opacity: 0.3, r: size + 4 }}
-          animate={{ opacity: [0.3, 0.8, 0.3], r: [size + 4, size + 12, size + 4] }}
+          initial={{ opacity: 0.3 }}
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}

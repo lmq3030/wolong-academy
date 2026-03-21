@@ -64,25 +64,17 @@ export function BattleScene({
 
       {/* Bottom ~55%: Code Editor + controls */}
       <div className="flex-1 flex flex-col min-h-0 relative">
-        {/* Challenge prompt bar */}
-        <div
-          className="flex-none px-4 py-2 border-b"
-          style={{
-            backgroundColor: 'rgba(245,240,232,0.95)',
-            borderColor: 'var(--color-bamboo)',
-          }}
-        >
-          <p
-            className="text-sm font-bold leading-snug"
-            style={{ color: 'var(--color-ink)', fontFamily: 'serif' }}
+        {/* Hint display bar (prompt is shown inside the editor component) */}
+        {currentHint && (
+          <div
+            className="flex-none px-4 py-2 border-b"
+            style={{
+              backgroundColor: 'rgba(245,240,232,0.95)',
+              borderColor: 'var(--color-bamboo)',
+            }}
           >
-            {currentChallenge.prompt}
-          </p>
-
-          {/* Hint display */}
-          {currentHint && (
             <motion.p
-              className="mt-1 text-sm px-3 py-1.5 rounded-lg border"
+              className="text-sm px-3 py-1.5 rounded-lg border"
               style={{
                 color: 'var(--color-wu-green)',
                 backgroundColor: 'rgba(45,106,79,0.06)',
@@ -94,8 +86,8 @@ export function BattleScene({
             >
               锦囊：{currentHint}
             </motion.p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Code editor area */}
         <div className="flex-1 min-h-0 overflow-auto">

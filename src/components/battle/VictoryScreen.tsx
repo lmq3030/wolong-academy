@@ -193,9 +193,9 @@ export function VictoryScreen({ rewards, stars, onContinue }: VictoryScreenProps
             backgroundColor: 'var(--color-shu-red)',
             fontFamily: 'serif',
           }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.2 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5 }}
         >
           继续
         </motion.button>
