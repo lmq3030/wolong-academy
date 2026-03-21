@@ -87,12 +87,14 @@ describe('FillBlankEditor', () => {
     expect(screen.getByText('请填写正确的Python代码来输出问候语')).toBeInTheDocument();
   });
 
-  it('renders dropdowns when choices are provided', () => {
+  it('renders choice buttons when choices are provided', () => {
     render(<FillBlankEditor challenge={challengeWithChoices} onSubmit={vi.fn()} />);
 
-    const select = screen.getByTestId('blank-select-0');
-    expect(select).toBeInTheDocument();
-    expect(select.tagName.toLowerCase()).toBe('select');
+    const blankArea = screen.getByTestId('blank-select-0');
+    expect(blankArea).toBeInTheDocument();
+    // Should show clickable choice buttons
+    expect(screen.getByText('点击选择')).toBeInTheDocument();
+    expect(screen.getByTestId('choice-0-0')).toBeInTheDocument();
   });
 
   it('renders text inputs when no choices are provided', () => {
@@ -113,8 +115,8 @@ describe('FillBlankEditor', () => {
   it('submit button is enabled when all blanks are filled', () => {
     render(<FillBlankEditor challenge={challengeWithChoices} onSubmit={vi.fn()} />);
 
-    const select = screen.getByTestId('blank-select-0');
-    fireEvent.change(select, { target: { value: '"你好"' } });
+    // Click the first choice button to fill the blank
+    fireEvent.click(screen.getByTestId('choice-0-0'));
 
     const submitBtn = screen.getByRole('button', { name: '提交答案' });
     expect(submitBtn).not.toBeDisabled();
@@ -124,8 +126,8 @@ describe('FillBlankEditor', () => {
     const onSubmit = vi.fn();
     render(<FillBlankEditor challenge={challengeWithChoices} onSubmit={onSubmit} />);
 
-    const select = screen.getByTestId('blank-select-0');
-    fireEvent.change(select, { target: { value: '"你好"' } });
+    // Click choice button to fill blank
+    fireEvent.click(screen.getByTestId('choice-0-0'));
 
     const submitBtn = screen.getByRole('button', { name: '提交答案' });
     fireEvent.click(submitBtn);
@@ -137,15 +139,13 @@ describe('FillBlankEditor', () => {
     const onSubmit = vi.fn();
     render(<FillBlankEditor challenge={challengeMultipleBlanks} onSubmit={onSubmit} />);
 
-    // Should have two select dropdowns
-    const select0 = screen.getByTestId('blank-select-0');
-    const select1 = screen.getByTestId('blank-select-1');
-    expect(select0).toBeInTheDocument();
-    expect(select1).toBeInTheDocument();
+    // Should have two blank areas
+    expect(screen.getByTestId('blank-select-0')).toBeInTheDocument();
+    expect(screen.getByTestId('blank-select-1')).toBeInTheDocument();
 
-    // Fill both blanks
-    fireEvent.change(select0, { target: { value: '"你好"' } });
-    fireEvent.change(select1, { target: { value: '"世界"' } });
+    // Fill both blanks by clicking choice buttons
+    fireEvent.click(screen.getByTestId('choice-0-0')); // "你好"
+    fireEvent.click(screen.getByTestId('choice-1-1')); // "世界"
 
     const submitBtn = screen.getByRole('button', { name: '提交答案' });
     expect(submitBtn).not.toBeDisabled();
@@ -182,8 +182,8 @@ describe('FillBlankEditor', () => {
   it('respects disabled state', () => {
     render(<FillBlankEditor challenge={challengeWithChoices} onSubmit={vi.fn()} disabled />);
 
-    const select = screen.getByTestId('blank-select-0');
-    expect(select).toBeDisabled();
+    // Choice buttons should not appear when disabled
+    expect(screen.queryByTestId('choice-0-0')).not.toBeInTheDocument();
 
     const submitBtn = screen.getByRole('button', { name: '提交答案' });
     expect(submitBtn).toBeDisabled();

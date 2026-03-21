@@ -89,31 +89,52 @@ export function FillBlankEditor({
             );
           }
 
-          // Blank segment
+          // Blank segment with choices: render as inline button that shows current selection
           if (hasChoices) {
+            const currentValue = answers[seg.index];
             return (
-              <select
+              <span
                 key={i}
                 data-testid={`blank-select-${seg.index}`}
-                value={answers[seg.index]}
-                onChange={(e) => updateAnswer(seg.index, e.target.value)}
-                disabled={disabled}
-                className="
-                  inline-block mx-1 px-3 py-1 text-lg font-mono
-                  bg-white border-b-3 border-[var(--color-gold)]
-                  rounded-md text-[var(--color-ink)]
-                  focus:outline-none focus:border-[var(--color-shu-red)]
-                  min-w-[120px] cursor-pointer
-                  disabled:opacity-50
-                "
+                className="inline-block mx-1 relative"
               >
-                <option value="">-- 选择 --</option>
-                {challenge.choices!.map((choice, ci) => (
-                  <option key={ci} value={choice}>
-                    {choice}
-                  </option>
-                ))}
-              </select>
+                <span
+                  className={`
+                    inline-block px-4 py-1 text-lg font-mono rounded-lg border-2 cursor-pointer
+                    min-w-[120px] text-center transition-all
+                    ${currentValue
+                      ? 'bg-green-50 border-green-400 text-[var(--color-ink)]'
+                      : 'bg-white border-[var(--color-gold)] text-[var(--color-bamboo)]'
+                    }
+                    ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
+                >
+                  {currentValue || '点击选择'}
+                </span>
+                {/* Choice buttons below */}
+                {!currentValue && !disabled && (
+                  <span className="flex gap-2 mt-2 flex-wrap" data-testid={`blank-choices-${seg.index}`}>
+                    {challenge.choices!.map((choice, ci) => (
+                      <button
+                        key={ci}
+                        type="button"
+                        onClick={() => updateAnswer(seg.index, choice)}
+                        className="
+                          px-4 py-2 text-base font-mono rounded-lg border-2
+                          border-[var(--color-gold)] bg-[var(--color-parchment)]
+                          text-[var(--color-ink)] cursor-pointer
+                          hover:border-[var(--color-shu-red)] hover:bg-white
+                          transition-all active:scale-95
+                          min-h-[44px]
+                        "
+                        data-testid={`choice-${seg.index}-${ci}`}
+                      >
+                        {choice}
+                      </button>
+                    ))}
+                  </span>
+                )}
+              </span>
             );
           }
 

@@ -93,7 +93,7 @@ export const chapter01: Chapter = {
     playerGeneral: 'guan-yu',
     enemyGeneral: 'hua-xiong',
     playerSkill: '落日弓',
-    bgScene: '/assets/scenes/guandu.png',
+    bgScene: '/assets/scenes/peach-garden.png',
   },
   rewards: {
     xp: 150,
