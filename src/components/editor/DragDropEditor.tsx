@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { EditorProps } from './types';
 import type { DragOption } from '@/lib/levels/types';
@@ -41,6 +41,10 @@ export function DragDropEditor({
   // Track which option is "selected" via click-to-select flow
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
+  // Stable ref for onSubmit to avoid useEffect re-triggering on callback identity change
+  const onSubmitRef = useRef(onSubmit);
+  onSubmitRef.current = onSubmit;
+
   // Track which option IDs have been placed in correct slots
   const placedOptionIds = new Set(
     slots.filter((s) => s.option !== null).map((s) => s.option!.id)
@@ -64,10 +68,10 @@ export function DragDropEditor({
       // Assemble code from slots in order
       const assembledCode = slots.map((s) => s.option!.code).join('\n');
       // Small delay so the user sees the final animation
-      const timer = setTimeout(() => onSubmit(assembledCode), 600);
+      const timer = setTimeout(() => onSubmitRef.current(assembledCode), 600);
       return () => clearTimeout(timer);
     }
-  }, [slots, slotCount, onSubmit]);
+  }, [slots, slotCount]);
 
   const attemptPlace = useCallback(
     (optionId: string, slotIndex: number) => {
