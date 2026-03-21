@@ -85,7 +85,7 @@ const mockChapter: Chapter = {
 function setupEngine(phaseOverride?: string) {
   const engineReturn = {
     state: {
-      phase: phaseOverride ?? 'challenge',
+      phase: (phaseOverride ?? 'challenge') as import('@/lib/engine/types').BattlePhase,
       currentChallengeIndex: 0,
       qiPercent: 60,
       stars: 3,

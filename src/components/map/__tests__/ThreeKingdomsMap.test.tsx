@@ -25,8 +25,8 @@ const mockGetProgress = vi.fn<() => LocalProgress>();
 const mockIsChapterUnlocked = vi.fn<(id: string, sorted: string[], completed: Record<string, any>) => boolean>();
 
 vi.mock('@/lib/progress', () => ({
-  getProgress: (...args: any[]) => mockGetProgress(...args),
-  isChapterUnlocked: (...args: any[]) => mockIsChapterUnlocked(...args),
+  getProgress: () => mockGetProgress(),
+  isChapterUnlocked: (id: string, sorted: string[], completed: Record<string, any>) => mockIsChapterUnlocked(id, sorted, completed),
 }));
 
 vi.mock('../CityNode', () => ({
