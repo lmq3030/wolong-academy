@@ -210,7 +210,7 @@ chapters: id, act, title, story_arc, python_concept, difficulty
 user_progress: user_id, chapter_id, stars(1-3), best_code, completed_at
 
 -- Equipment/items
-items: id, name, type(weapon/horse/book/jewel), effect
+items: id, name, type(weapon/mount/book/pouch), effect
 user_items: user_id, item_id, equipped_to_general_id
 
 -- Achievements
@@ -227,7 +227,7 @@ interface Chapter {
   title: string;           // "温酒斩华雄"
   storyIntro: string;      // Story introduction text
   pythonConcept: string;   // "print() 基础输出"
-  difficulty: 1-5;
+  difficulty: 1 | 2 | 3 | 4 | 5;
   interactionMode: "drag" | "fill" | "code" | "mixed";
   challenges: Challenge[];
   battle: {
