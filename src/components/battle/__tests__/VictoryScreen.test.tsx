@@ -157,6 +157,24 @@ describe('VictoryScreen', () => {
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
+  it('shows 0 stars when stars=0', () => {
+    const { container } = render(
+      <VictoryScreen rewards={baseRewards} stars={0} onContinue={vi.fn()} />
+    );
+    const starSvgs = container.querySelectorAll('svg[viewBox="0 0 24 24"]');
+    // Should still render 3 star SVGs
+    expect(starSvgs).toHaveLength(3);
+    // All should be empty (fill="#ccc")
+    const filledStars = Array.from(starSvgs).filter(
+      (svg) => svg.getAttribute('fill') === 'var(--color-gold)'
+    );
+    const emptyStars = Array.from(starSvgs).filter(
+      (svg) => svg.getAttribute('fill') === '#ccc'
+    );
+    expect(filledStars).toHaveLength(0);
+    expect(emptyStars).toHaveLength(3);
+  });
+
   it('clamps stars to max 3', () => {
     const { container } = render(
       <VictoryScreen rewards={baseRewards} stars={5} onContinue={vi.fn()} />

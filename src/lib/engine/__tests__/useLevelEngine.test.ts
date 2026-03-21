@@ -25,6 +25,9 @@ vi.mock('../codeValidator', () => ({
 }));
 
 import { useLevelEngine } from '../useLevelEngine';
+import { validateDynamic } from '../codeValidator';
+
+const mockValidateDynamic = vi.mocked(validateDynamic);
 
 const testChapter: Chapter = {
   id: 'test-chapter',
@@ -70,6 +73,7 @@ describe('useLevelEngine', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     mockRunCode.mockReset();
+    mockValidateDynamic.mockReset();
   });
 
   afterEach(() => {
@@ -448,6 +452,174 @@ describe('useLevelEngine', () => {
       // Fourth use should still return last hint
       act(() => { result.current.useHint(); });
       expect(result.current.state.currentHint).toBe('h3');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('goes to skill_ready on last challenge even when qi is below 100', () => {
+      // Create a chapter where total qi rewards don't reach 100
+      const lowQiChapter: Chapter = {
+        ...testChapter,
+        challenges: [
+          {
+            id: 'lq1',
+            type: 'drag',
+            prompt: 'Low qi 1',
+            correctAnswer: 'print("a")',
+            testCases: [{ expectedOutput: 'a', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 30,
+            dragOptions: [{ id: 'o1', code: 'print("a")', isCorrect: true, slot: 0 }],
+          },
+          {
+            id: 'lq2',
+            type: 'drag',
+            prompt: 'Low qi 2',
+            correctAnswer: 'print("b")',
+            testCases: [{ expectedOutput: 'b', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 30,
+            dragOptions: [{ id: 'o2', code: 'print("b")', isCorrect: true, slot: 0 }],
+          },
+          {
+            id: 'lq3',
+            type: 'drag',
+            prompt: 'Low qi 3',
+            correctAnswer: 'print("c")',
+            testCases: [{ expectedOutput: 'c', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 30,
+            dragOptions: [{ id: 'o3', code: 'print("c")', isCorrect: true, slot: 0 }],
+          },
+        ],
+      };
+
+      const { result } = renderHook(() => useLevelEngine(lowQiChapter));
+
+      act(() => { result.current.nextPhase(); }); // story -> challenge
+
+      // Challenge 1: qi=30
+      act(() => { result.current.submitCode('print("a")'); });
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(result.current.state.phase).toBe('challenge');
+      expect(result.current.state.qiPercent).toBe(30);
+
+      // Challenge 2: qi=60
+      act(() => { result.current.submitCode('print("b")'); });
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(result.current.state.phase).toBe('challenge');
+      expect(result.current.state.qiPercent).toBe(60);
+
+      // Challenge 3 (LAST): qi=90, below 100 but should still trigger skill_ready
+      act(() => { result.current.submitCode('print("c")'); });
+      expect(result.current.state.qiPercent).toBe(90);
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(result.current.state.phase).toBe('skill_ready');
+    });
+
+    it('clamps qiPercent to 100 on oversized qi rewards', () => {
+      // Chapter where a single challenge gives qi=80, but total would exceed 100
+      const bigQiChapter: Chapter = {
+        ...testChapter,
+        challenges: [
+          {
+            id: 'bq1',
+            type: 'drag',
+            prompt: 'Big qi 1',
+            correctAnswer: 'print("a")',
+            testCases: [{ expectedOutput: 'a', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 80,
+            dragOptions: [{ id: 'o1', code: 'print("a")', isCorrect: true, slot: 0 }],
+          },
+          {
+            id: 'bq2',
+            type: 'drag',
+            prompt: 'Big qi 2',
+            correctAnswer: 'print("b")',
+            testCases: [{ expectedOutput: 'b', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 50,
+            dragOptions: [{ id: 'o2', code: 'print("b")', isCorrect: true, slot: 0 }],
+          },
+        ],
+      };
+
+      const { result } = renderHook(() => useLevelEngine(bigQiChapter));
+
+      act(() => { result.current.nextPhase(); }); // story -> challenge
+
+      // Challenge 1: qi=80
+      act(() => { result.current.submitCode('print("a")'); });
+      expect(result.current.state.qiPercent).toBe(80);
+      act(() => { vi.advanceTimersByTime(1000); });
+
+      // Challenge 2: qi should clamp to 100, not 130
+      act(() => { result.current.submitCode('print("b")'); });
+      expect(result.current.state.qiPercent).toBe(100);
+    });
+
+    it('uses dynamic validator for free_code challenges', async () => {
+      const freeCodeChapter: Chapter = {
+        ...testChapter,
+        challenges: [
+          {
+            id: 'fc1',
+            type: 'free_code',
+            prompt: 'Write code',
+            correctAnswer: 'print("hi")',
+            testCases: [{ expectedOutput: 'hi', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 100,
+          },
+        ],
+      };
+
+      // Configure the validateDynamic mock to resolve with a correct result
+      mockValidateDynamic.mockResolvedValue({ correct: true, output: 'hi' });
+
+      const { result } = renderHook(() => useLevelEngine(freeCodeChapter));
+
+      act(() => { result.current.nextPhase(); });
+
+      await act(async () => {
+        await result.current.submitCode('print("hi")');
+      });
+
+      // validateDynamic should have been called (not validateStatic)
+      expect(mockValidateDynamic).toHaveBeenCalled();
+      expect(result.current.state.phase).toBe('qi_charging');
+    });
+
+    it('routes multiple_choice through static validation', () => {
+      const mcChapter: Chapter = {
+        ...testChapter,
+        challenges: [
+          {
+            id: 'mc1',
+            type: 'multiple_choice',
+            prompt: 'Pick one',
+            correctAnswer: 'print("hello")',
+            codeTemplate: 'print(___)',
+            choices: ['"hello"', '"bye"'],
+            testCases: [{ expectedOutput: 'hello', description: 'test' }],
+            hints: ['h1', 'h2', 'h3'],
+            qiReward: 100,
+          },
+        ],
+      };
+
+      const { result } = renderHook(() => useLevelEngine(mcChapter));
+
+      act(() => { result.current.nextPhase(); });
+
+      act(() => {
+        result.current.submitCode('print("hello")');
+      });
+
+      // Should NOT have called runCode (dynamic); validateStatic handles it
+      expect(mockRunCode).not.toHaveBeenCalled();
+      expect(result.current.state.phase).toBe('qi_charging');
     });
   });
 

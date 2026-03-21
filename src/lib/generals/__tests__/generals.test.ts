@@ -3,6 +3,7 @@ import {
   generals,
   getGeneralById,
   getGeneralsByFaction,
+  factionMeta,
   type Faction,
 } from '@/lib/generals';
 
@@ -77,5 +78,17 @@ describe('getGeneralsByFaction', () => {
     );
 
     expect(totalGrouped).toBe(generals.length);
+  });
+});
+
+describe('factionMeta coverage', () => {
+  it('factionMeta covers all faction values used in generals array', () => {
+    const usedFactions = new Set(generals.map((g) => g.faction));
+
+    for (const faction of usedFactions) {
+      expect(factionMeta[faction]).toBeDefined();
+      expect(factionMeta[faction].label).toBeTruthy();
+      expect(factionMeta[faction].color).toBeTruthy();
+    }
   });
 });

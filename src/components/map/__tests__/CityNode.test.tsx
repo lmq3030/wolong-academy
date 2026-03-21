@@ -167,6 +167,31 @@ describe('CityNode', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it('supports keyboard navigation (Enter/Space) for unlocked nodes', () => {
+    renderCityNode({ status: 'current' });
+
+    const button = screen.getByRole('button');
+
+    // Enter key triggers navigation
+    fireEvent.keyDown(button, { key: 'Enter' });
+    expect(pushMock).toHaveBeenCalledWith('/battle/ch-1');
+
+    pushMock.mockClear();
+
+    // Space key triggers navigation
+    fireEvent.keyDown(button, { key: ' ' });
+    expect(pushMock).toHaveBeenCalledWith('/battle/ch-1');
+
+    pushMock.mockClear();
+
+    // Also works for completed nodes
+    const { unmount } = renderCityNode({ status: 'completed', stars: 2 });
+    const completedButtons = screen.getAllByRole('button');
+    // The second button is the newly rendered completed node
+    fireEvent.keyDown(completedButtons[completedButtons.length - 1], { key: 'Enter' });
+    expect(pushMock).toHaveBeenCalledWith('/battle/ch-1');
+  });
+
   it('shows correct number of filled stars for completed chapters', () => {
     const { container } = renderCityNode({ status: 'completed', stars: 2 });
 

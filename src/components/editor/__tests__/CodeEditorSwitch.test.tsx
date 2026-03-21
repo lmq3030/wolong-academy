@@ -123,4 +123,21 @@ describe('CodeEditorSwitch', () => {
     const textarea = screen.getByRole('textbox');
     expect(textarea).toBeInTheDocument();
   });
+
+  it('falls back to FreeCodeEditor for unknown challenge type', () => {
+    const unknownChallenge = {
+      ...baseChallengeFields,
+      id: 'switch-unknown',
+      type: 'some_future_type' as Challenge['type'], // cast to bypass TS
+      prompt: 'Unknown type test prompt',
+      codeTemplate: '# unknown type',
+    } as Challenge;
+
+    render(<CodeEditorSwitch challenge={unknownChallenge} onSubmit={vi.fn()} />);
+
+    // Should fall back to FreeCodeEditor which renders a textarea
+    expect(screen.getByText('Unknown type test prompt')).toBeInTheDocument();
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toBeInTheDocument();
+  });
 });

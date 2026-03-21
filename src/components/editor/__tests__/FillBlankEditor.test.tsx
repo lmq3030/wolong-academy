@@ -159,4 +159,33 @@ describe('FillBlankEditor', () => {
 
     expect(screen.getByRole('button', { name: '提交答案' })).toBeInTheDocument();
   });
+
+  it('falls back to correctAnswer as template when codeTemplate is missing', () => {
+    const challengeNoTemplate: Challenge = {
+      id: 'fill-no-tpl',
+      type: 'fill_blank',
+      prompt: 'No template challenge',
+      // no codeTemplate — should fall back to correctAnswer
+      correctAnswer: 'x = ___',
+      testCases: [{ expectedOutput: '42', description: 'test' }],
+      hints: ['hint'],
+      qiReward: 25,
+    };
+
+    render(<FillBlankEditor challenge={challengeNoTemplate} onSubmit={vi.fn()} />);
+
+    // The blank should still be parsed from the correctAnswer fallback
+    const input = screen.getByTestId('blank-input-0');
+    expect(input).toBeInTheDocument();
+  });
+
+  it('respects disabled state', () => {
+    render(<FillBlankEditor challenge={challengeWithChoices} onSubmit={vi.fn()} disabled />);
+
+    const select = screen.getByTestId('blank-select-0');
+    expect(select).toBeDisabled();
+
+    const submitBtn = screen.getByRole('button', { name: '提交答案' });
+    expect(submitBtn).toBeDisabled();
+  });
 });
