@@ -21,11 +21,14 @@
 
 **Step 1: Initialize Next.js project**
 
+Note: The repo already has `docs/` and research markdown files. Move them aside, scaffold, then restore:
 ```bash
+mkdir /tmp/pgame-backup && mv docs three-kingdoms-research.md sango-heroes-2-mechanics.md /tmp/pgame-backup/
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
+mv /tmp/pgame-backup/* . && rm -rf /tmp/pgame-backup
 ```
 
-Expected: Project scaffolded with `src/app/` structure.
+Expected: Project scaffolded with `src/app/` structure, existing docs preserved.
 
 **Step 2: Install core dependencies**
 
@@ -200,7 +203,7 @@ git add -A && git commit -m "feat: add Pyodide Web Worker integration with usePy
 **Step 1: Define schema**
 
 Create `src/db/schema.ts` with Drizzle schema for all 6 tables from design:
-- `users` — id (uuid), name, avatar, level (default 1), xp (default 0), createdAt
+- `users` — id (uuid), name, email, emailVerified, image (required by NextAuth adapter), plus game fields: avatar, level (default 1), xp (default 0), createdAt
 - `generals` — id, name, faction (enum: shu/wei/wu/other), traits, skillName, imageUrl
 - `userGenerals` — userId, generalId, unlockedAt (composite PK)
 - `chapters` — id, act (1-4), title, storyArc, pythonConcept, difficulty (1-5)
@@ -972,9 +975,10 @@ Generate first batch (Act I unlocks):
 - 貂蝉 (elegant, beautiful, silk dress)
 - 曹操 (ambitious expression, blue/black robes, crown)
 
-Command per image:
+Command per image (use the `nanobanana` skill via Claude Code's Skill tool, or run the script directly):
 ```bash
-python3 /Users/muqi.li/.claude/plugins/cache/claude-code-settings/claude-code-settings/2.1.6/skills/nanobanana-skill/nanobanana.py \
+# If running manually, set NANOBANANA=path/to/nanobanana.py or use: which nanobanana || echo "Install via claude-code-settings plugin"
+python3 "${NANOBANANA:-nanobanana.py}" \
   --prompt "Cute cartoon chibi-style Three Kingdoms warrior 关羽 (Guan Yu), red face, long beautiful beard, wearing green robes with golden armor, wielding the legendary Green Dragon Crescent Blade (青龙偃月刀), riding Red Hare horse, Q-version character design, colorful, white background, game card portrait, Chinese historical fantasy, kid-friendly, bright warm colors" \
   --size 1024x1024 \
   --model gemini-3-pro-image-preview \
