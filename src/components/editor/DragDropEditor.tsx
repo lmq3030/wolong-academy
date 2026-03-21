@@ -38,18 +38,6 @@ export function DragDropEditor({
     }))
   );
 
-  // Reset slots when challenge changes
-  useEffect(() => {
-    setSlots(
-      Array.from({ length: slotCount }, () => ({
-        option: null,
-        correct: false,
-        wrong: false,
-      }))
-    );
-    setSelectedOptionId(null);
-  }, [challenge.id, slotCount]);
-
   // Track which option is "selected" via click-to-select flow
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
@@ -197,15 +185,13 @@ export function DragDropEditor({
               slot.wrong
                 ? { x: [0, -8, 8, -8, 8, 0] }
                 : slot.correct
-                  ? { scale: [1, 1.03, 1] }
-                  : {}
+                  ? { scale: 1.03 }
+                  : { scale: 1 }
             }
             transition={
               slot.wrong
                 ? { duration: 0.4 }
-                : slot.correct
-                  ? { type: 'spring', stiffness: 300, damping: 15 }
-                  : {}
+                : { type: 'spring', stiffness: 300, damping: 15 }
             }
             onDragOver={(e) => handleDragOver(e, index)}
             onDragLeave={handleDragLeave}

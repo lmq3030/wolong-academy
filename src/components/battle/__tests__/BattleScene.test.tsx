@@ -75,8 +75,8 @@ vi.mock('../VictoryScreen', () => ({
 }));
 
 vi.mock('@/components/editor/CodeEditorSwitch', () => ({
-  CodeEditorSwitch: ({ challenge, onSubmit, disabled }: any) => (
-    <div data-testid="code-editor" data-disabled={disabled}>
+  CodeEditorSwitch: ({ challenge, onSubmit, disabled, ...rest }: any) => (
+    <div data-testid="code-editor" data-disabled={disabled} data-challenge-id={challenge.id}>
       <span>{challenge.prompt}</span>
     </div>
   ),
@@ -247,5 +247,28 @@ describe('BattleScene', () => {
   it('does not show VictoryScreen when phase is victory but rewards is missing', () => {
     render(<BattleScene {...defaultProps} phase="victory" />);
     expect(screen.queryByTestId('victory-screen')).not.toBeInTheDocument();
+  });
+
+  it('re-mounts editor when challenge changes (key={challenge.id} isolation)', () => {
+    const challenge1: Challenge = {
+      ...mockChallenge,
+      id: 'challenge-1',
+      prompt: 'First challenge',
+    };
+    const challenge2: Challenge = {
+      ...mockChallenge,
+      id: 'challenge-2',
+      prompt: 'Second challenge',
+    };
+
+    const { rerender } = render(
+      <BattleScene {...defaultProps} currentChallenge={challenge1} phase="challenge" />
+    );
+    expect(screen.getByTestId('code-editor').getAttribute('data-challenge-id')).toBe('challenge-1');
+
+    rerender(
+      <BattleScene {...defaultProps} currentChallenge={challenge2} phase="challenge" />
+    );
+    expect(screen.getByTestId('code-editor').getAttribute('data-challenge-id')).toBe('challenge-2');
   });
 });

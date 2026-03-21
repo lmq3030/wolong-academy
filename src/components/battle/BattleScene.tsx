@@ -100,6 +100,7 @@ export function BattleScene({
         {/* Code editor area */}
         <div className="flex-1 min-h-0 overflow-auto">
           <CodeEditorSwitch
+            key={currentChallenge.id}
             challenge={currentChallenge}
             onSubmit={onSubmitCode}
             disabled={isEditorDisabled}
