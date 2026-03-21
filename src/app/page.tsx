@@ -1,6 +1,5 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -159,8 +158,7 @@ const steps = [
 /* ─── Main Landing Page ──────────────────────────────────────────────── */
 
 export default function Home() {
-  const { data: session } = useSession();
-  const ctaHref = session ? '/map' : '/login';
+  const ctaHref = '/map';
 
   return (
     <div className="flex min-h-screen flex-col bg-parchment">

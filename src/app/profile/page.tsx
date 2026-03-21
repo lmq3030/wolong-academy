@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getProgress, type LocalProgress } from '@/lib/progress';
@@ -57,15 +56,14 @@ function XPBar({ xp, level }: { xp: number; level: number }) {
 /* ─── Main Profile Page ──────────────────────────────────────────────── */
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
   const [progress, setProgress] = useState<LocalProgress | null>(null);
 
   useEffect(() => {
     setProgress(getProgress());
   }, []);
 
-  const playerName = session?.user?.name ?? '小军师';
-  const playerImage = session?.user?.image;
+  const playerName = '小军师';
+  const playerImage: string | undefined = undefined;
   const initials = playerName.charAt(0).toUpperCase();
 
   return (
