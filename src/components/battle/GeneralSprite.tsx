@@ -24,22 +24,31 @@ interface GeneralSpriteProps {
  * For now, uses a hardcoded lookup; real data will come from a generals registry.
  */
 const GENERAL_NAME_MAP: Record<string, string> = {
-  guan_yu: '关',
-  zhang_fei: '张',
-  liu_bei: '刘',
-  zhao_yun: '赵',
-  zhuge_liang: '诸',
-  cao_cao: '曹',
-  xiahou_dun: '夏',
-  lu_bu: '吕',
-  sun_ce: '孙',
-  zhou_yu: '周',
-  huang_zhong: '黄',
-  ma_chao: '马',
+  'guan-yu': '关',
+  'zhang-fei': '张',
+  'liu-bei': '刘',
+  'zhao-yun': '赵',
+  'zhuge-liang': '诸',
+  'cao-cao': '曹',
+  'xiahou-dun': '夏',
+  'lu-bu': '吕',
+  'sun-ce': '孙',
+  'zhou-yu': '周',
+  'huang-zhong': '黄',
+  'ma-chao': '马',
+  'diao-chan': '貂',
+  'sun-quan': '权',
+  'lu-su': '鲁',
+  'huang-gai': '盖',
+  'sima-yi': '司',
+  'jiang-wei': '姜',
+  'meng-huo': '孟',
 };
 
 function getDisplayChar(generalId: string): string {
-  return GENERAL_NAME_MAP[generalId] || generalId.charAt(0).toUpperCase();
+  // Support both hyphenated (liu-bei) and underscored (liu_bei) IDs
+  const normalized = generalId.replace(/_/g, '-');
+  return GENERAL_NAME_MAP[normalized] || generalId.charAt(0).toUpperCase();
 }
 
 function getPhaseAnimation(phase: BattlePhase, side: 'left' | 'right') {

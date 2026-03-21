@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useLevelEngine } from '@/lib/engine/useLevelEngine';
 import { BattleScene } from '@/components/battle/BattleScene';
+import { saveChapterProgress, addXP, unlockGenerals } from '@/lib/progress';
 import type { Chapter } from '@/lib/levels/types';
 
 export function BattleClient({ chapter }: { chapter: Chapter }) {
@@ -11,7 +12,14 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
 
   const handleNextPhase = () => {
     if (engine.state.phase === 'rewards') {
-      // Save progress (placeholder until DB is connected)
+      // Save progress to localStorage (the source of truth for MVP)
+      saveChapterProgress(chapter.id, engine.state.stars);
+      addXP(chapter.rewards.xp);
+      if (chapter.rewards.unlockGenerals) {
+        unlockGenerals(chapter.rewards.unlockGenerals);
+      }
+
+      // Also fire API call for future DB persistence
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

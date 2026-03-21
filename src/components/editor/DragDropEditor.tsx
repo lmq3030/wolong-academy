@@ -38,6 +38,18 @@ export function DragDropEditor({
     }))
   );
 
+  // Reset slots when challenge changes
+  useEffect(() => {
+    setSlots(
+      Array.from({ length: slotCount }, () => ({
+        option: null,
+        correct: false,
+        wrong: false,
+      }))
+    );
+    setSelectedOptionId(null);
+  }, [challenge.id, slotCount]);
+
   // Track which option is "selected" via click-to-select flow
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
