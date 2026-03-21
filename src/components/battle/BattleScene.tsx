@@ -28,6 +28,7 @@ interface BattleSceneProps {
   errorMessage?: string;
   errorLine?: number;
   rewards?: ChapterRewards;
+  stars?: number;
   onSubmitCode: (code: string) => void;
   onNextPhase: () => void;
   onUseHint: () => void;
@@ -42,6 +43,7 @@ export function BattleScene({
   errorMessage,
   errorLine,
   rewards,
+  stars = 3,
   onSubmitCode,
   onNextPhase,
   onUseHint,
@@ -181,7 +183,7 @@ export function BattleScene({
           <VictoryScreen
             key="victory"
             rewards={rewards}
-            stars={3}
+            stars={stars}
             onContinue={onNextPhase}
           />
         )}
