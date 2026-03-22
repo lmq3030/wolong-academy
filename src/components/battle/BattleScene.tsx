@@ -64,16 +64,16 @@ export function BattleScene({
 
       {/* Bottom ~55%: Code Editor + controls */}
       <div className="flex-1 flex flex-col min-h-0 relative">
-        {/* Hint display bar (prompt is shown inside the editor component) */}
-        {currentHint && (
-          <div
-            className="flex-none px-4 py-2 border-b"
-            style={{
-              backgroundColor: 'rgba(245,240,232,0.95)',
-              borderColor: 'var(--color-bamboo)',
-            }}
-          >
-            <motion.p
+        {/* Hint display bar — always rendered for stable hydration, hidden when empty */}
+        <div
+          className={`flex-none px-4 py-2 border-b transition-all ${currentHint ? '' : 'hidden'}`}
+          style={{
+            backgroundColor: 'rgba(245,240,232,0.95)',
+            borderColor: 'var(--color-bamboo)',
+          }}
+        >
+          {currentHint && (
+            <p
               className="text-sm px-3 py-1.5 rounded-lg border"
               style={{
                 color: 'var(--color-wu-green)',
@@ -81,13 +81,11 @@ export function BattleScene({
                 borderColor: 'rgba(45,106,79,0.2)',
                 fontFamily: 'serif',
               }}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
             >
               锦囊：{currentHint}
-            </motion.p>
-          </div>
-        )}
+            </p>
+          )}
+        </div>
 
         {/* Code editor area */}
         <div className="flex-1 min-h-0 overflow-auto">
