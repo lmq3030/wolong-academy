@@ -81,7 +81,7 @@ export const chapter03: Chapter = {
   battle: {
     playerGeneral: 'liu-bei',
     playerSkill: '连环计',
-    bgScene: '/assets/scenes/peach-garden.png',
+    bgScene: '/assets/scenes/palace-night.png',
   },
   rewards: {
     xp: 200,

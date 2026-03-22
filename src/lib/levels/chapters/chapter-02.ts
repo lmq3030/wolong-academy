@@ -102,7 +102,7 @@ export const chapter02: Chapter = {
     playerGeneral: 'liu-bei',
     enemyGeneral: 'lu-bu',
     playerSkill: '三英合击',
-    bgScene: '/assets/scenes/peach-garden.png',
+    bgScene: '/assets/scenes/hulao-pass.png',
   },
   rewards: {
     xp: 200,

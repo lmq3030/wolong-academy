@@ -83,7 +83,7 @@ export const chapter05: Chapter = {
   battle: {
     playerGeneral: 'guan-yu',
     playerSkill: '连弩激射',
-    bgScene: '/assets/scenes/peach-garden.png',
+    bgScene: '/assets/scenes/mountain-pass.png',
   },
   rewards: {
     xp: 300,
