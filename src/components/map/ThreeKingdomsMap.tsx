@@ -143,7 +143,7 @@ export function ThreeKingdomsMap({ chapters }: ThreeKingdomsMapProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-parchment">
-      <MapNavBar progress={progress} />
+      <MapNavBar progress={progress} onUserSwitch={() => setProgress(getProgress())} />
 
       <main className="relative flex-1 overflow-auto">
         {/* Parchment texture overlay */}

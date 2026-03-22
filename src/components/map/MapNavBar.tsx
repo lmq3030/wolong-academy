@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import type { LocalProgress } from '@/lib/progress';
+import { UserSwitchButton } from '@/components/user/UserSwitchButton';
 
 interface MapNavBarProps {
   progress: LocalProgress;
+  /** Called when the user switches profiles so the parent can reload progress */
+  onUserSwitch?: () => void;
 }
 
-export function MapNavBar({ progress }: MapNavBarProps) {
+export function MapNavBar({ progress, onUserSwitch }: MapNavBarProps) {
   const xpInLevel = progress.xp % 300;
   const xpPercent = Math.min(100, (xpInLevel / 300) * 100);
 
@@ -36,11 +39,12 @@ export function MapNavBar({ progress }: MapNavBarProps) {
         </span>
       </div>
 
-      {/* Right: Nav links */}
+      {/* Right: Nav links + user switch */}
       <div className="flex items-center gap-1 sm:gap-3">
         <NavButton href="/generals" label="武将" icon={SwordsIcon} />
         <NavButton href="/study" label="兵书" icon={BookIcon} />
         <NavButton href="/profile" label="个人" icon={UserIcon} />
+        <UserSwitchButton onSwitch={onUserSwitch} />
       </div>
     </nav>
   );

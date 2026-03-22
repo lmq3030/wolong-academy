@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getProgress, type LocalProgress } from '@/lib/progress';
+import { getCurrentUser } from '@/lib/user';
+import { UserSwitchButton } from '@/components/user/UserSwitchButton';
 import { StatsPanel } from '@/components/profile/StatsPanel';
 import { AchievementList } from '@/components/profile/AchievementList';
 
@@ -57,12 +59,20 @@ function XPBar({ xp, level }: { xp: number; level: number }) {
 
 export default function ProfilePage() {
   const [progress, setProgress] = useState<LocalProgress | null>(null);
+  const [playerName, setPlayerName] = useState('小军师');
+
+  const loadUserData = () => {
+    setProgress(getProgress());
+    const user = getCurrentUser();
+    if (user) {
+      setPlayerName(user.username);
+    }
+  };
 
   useEffect(() => {
-    setProgress(getProgress());
+    loadUserData();
   }, []);
 
-  const playerName = '小军师';
   const playerImage: string | undefined = undefined;
   const initials = playerName.charAt(0).toUpperCase();
 
@@ -79,9 +89,10 @@ export default function ProfilePage() {
           <ArrowLeftIcon className="w-4 h-4" />
           返回地图
         </Link>
-        <h1 className="text-xl font-bold text-ink flex-1 text-center pr-16">
+        <h1 className="text-xl font-bold text-ink flex-1 text-center">
           个人战绩
         </h1>
+        <UserSwitchButton onSwitch={loadUserData} />
       </header>
 
       <main className="flex-1 px-4 sm:px-6 py-8 max-w-2xl mx-auto w-full flex flex-col gap-8">

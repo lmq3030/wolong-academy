@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   getProgress,
   saveChapterProgress,
@@ -242,6 +242,66 @@ describe('progress', () => {
       expect(() => resetProgress()).not.toThrow();
 
       globalThis.window = origWindow;
+    });
+  });
+
+  describe('user-scoped progress', () => {
+    const userId = 'user-test-123';
+    const userProfile = {
+      id: userId,
+      username: 'TestKid',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    afterEach(() => {
+      // Clean up user keys
+      mockStorage.removeItem('wolong-users');
+      mockStorage.removeItem('wolong-current');
+      mockStorage.removeItem(`wolong-progress-${userId}`);
+    });
+
+    it('uses user-scoped key when a current user is set', () => {
+      // Set up a current user in localStorage
+      mockStorage.setItem('wolong-users', JSON.stringify([userProfile]));
+      mockStorage.setItem('wolong-current', userId);
+
+      // Save progress — should go to user-scoped key
+      addXP(200);
+
+      const storedRaw = mockStorage.getItem(`wolong-progress-${userId}`);
+      expect(storedRaw).not.toBeNull();
+      const stored = JSON.parse(storedRaw!);
+      expect(stored.xp).toBe(200);
+
+      // Legacy key should not have been written
+      const legacyRaw = mockStorage.getItem('wolong-progress');
+      expect(legacyRaw).toBeNull();
+    });
+
+    it('isolates progress between users', () => {
+      const userId2 = 'user-test-456';
+      const userProfile2 = { id: userId2, username: 'Kid2', createdAt: '2026-01-01T00:00:00.000Z' };
+
+      mockStorage.setItem('wolong-users', JSON.stringify([userProfile, userProfile2]));
+
+      // Set user 1 as current and save progress
+      mockStorage.setItem('wolong-current', userId);
+      addXP(100);
+
+      // Switch to user 2
+      mockStorage.setItem('wolong-current', userId2);
+      addXP(500);
+
+      // Verify user 1's progress is separate
+      mockStorage.setItem('wolong-current', userId);
+      expect(getProgress().xp).toBe(100);
+
+      // Verify user 2's progress
+      mockStorage.setItem('wolong-current', userId2);
+      expect(getProgress().xp).toBe(500);
+
+      // Clean up
+      mockStorage.removeItem(`wolong-progress-${userId2}`);
     });
   });
 });

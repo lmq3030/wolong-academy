@@ -1,5 +1,7 @@
 'use client';
 
+import { getCurrentUser } from './user';
+
 export interface ChapterResult {
   stars: number;       // 1-3
   completedAt: string; // ISO date string
@@ -12,7 +14,15 @@ export interface LocalProgress {
   level: number;
 }
 
-const STORAGE_KEY = 'wolong-progress';
+/**
+ * Get the localStorage key for progress data.
+ * When a user is active, progress is scoped to that user.
+ * Falls back to the legacy key for backward compatibility.
+ */
+function getStorageKey(): string {
+  const user = getCurrentUser();
+  return user ? `wolong-progress-${user.id}` : 'wolong-progress';
+}
 
 function defaultProgress(): LocalProgress {
   return {
@@ -26,7 +36,7 @@ function defaultProgress(): LocalProgress {
 export function getProgress(): LocalProgress {
   if (typeof window === 'undefined') return defaultProgress();
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(getStorageKey());
     return stored ? JSON.parse(stored) : defaultProgress();
   } catch {
     return defaultProgress();
@@ -36,7 +46,7 @@ export function getProgress(): LocalProgress {
 function saveProgress(progress: LocalProgress): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(getStorageKey(), JSON.stringify(progress));
   } catch {
     // localStorage may be full or unavailable — silently fail for MVP
   }
@@ -108,5 +118,5 @@ export function isChapterUnlocked(
  */
 export function resetProgress(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(getStorageKey());
 }

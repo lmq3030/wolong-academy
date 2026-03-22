@@ -1,7 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { getCurrentUser } from '@/lib/user';
+import { UserSelectDialog } from '@/components/user/UserSelectDialog';
 
 /* ─── SVG Icon Components ────────────────────────────────────────────── */
 
@@ -160,8 +163,29 @@ const steps = [
 export default function Home() {
   const ctaHref = '/map';
 
+  const [showUserDialog, setShowUserDialog] = useState(false);
+  const [userChecked, setUserChecked] = useState(false);
+
+  useEffect(() => {
+    // On mount, check if a user is selected. If not, show the dialog.
+    const user = getCurrentUser();
+    if (!user) {
+      setShowUserDialog(true);
+    }
+    setUserChecked(true);
+  }, []);
+
+  const handleUserSelected = () => {
+    setShowUserDialog(false);
+  };
+
+  // Don't render until we've checked for a user (avoids flash)
+  if (!userChecked) return null;
+
   return (
     <div className="flex min-h-screen flex-col bg-parchment">
+      {/* User selection dialog */}
+      <UserSelectDialog open={showUserDialog} onUserSelected={handleUserSelected} />
       {/* Decorative top border */}
       <div className="h-1.5 bg-gradient-to-r from-shu-red via-gold to-shu-red" />
 
