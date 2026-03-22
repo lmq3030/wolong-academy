@@ -1,4 +1,5 @@
 export type BattlePhase =
+  | 'concept_intro'
   | 'story_intro'
   | 'challenge'
   | 'validating'

@@ -99,17 +99,26 @@ export function FillBlankEditor({
                 className="inline-block mx-1 relative"
               >
                 <span
+                  onClick={() => {
+                    if (currentValue && !disabled) updateAnswer(seg.index, '');
+                  }}
                   className={`
                     inline-block px-4 py-1 text-lg font-mono rounded-lg border-2 cursor-pointer
                     min-w-[120px] text-center transition-all
                     ${currentValue
-                      ? 'bg-green-50 border-green-400 text-[var(--color-ink)]'
+                      ? 'bg-green-50 border-green-400 text-[var(--color-ink)] hover:bg-red-50 hover:border-red-300'
                       : 'bg-white border-[var(--color-gold)] text-[var(--color-bamboo)]'
                     }
                     ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
                   `}
+                  title={currentValue ? '点击撤销选择' : ''}
                 >
-                  {currentValue || '点击选择'}
+                  {currentValue ? (
+                    <span className="flex items-center gap-1">
+                      {currentValue}
+                      {!disabled && <span className="text-red-400 text-sm">✕</span>}
+                    </span>
+                  ) : '点击选择'}
                 </span>
                 {/* Choice buttons below */}
                 {!currentValue && !disabled && (

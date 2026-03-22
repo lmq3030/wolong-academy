@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { TTSButton } from '@/components/ui/TTSButton';
 
 interface StoryIntroProps {
   title: string;
@@ -70,16 +71,19 @@ export function StoryIntro({ title, story, onContinue }: StoryIntroProps) {
           style={{ backgroundColor: 'var(--color-gold)' }}
         />
 
-        {/* Title */}
-        <h1
-          className="text-3xl font-bold text-center mb-6"
-          style={{
-            color: 'var(--color-ink)',
-            fontFamily: 'serif',
-          }}
-        >
-          {title}
-        </h1>
+        {/* Title + TTS */}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <h1
+            className="text-3xl font-bold"
+            style={{
+              color: 'var(--color-ink)',
+              fontFamily: 'serif',
+            }}
+          >
+            {title}
+          </h1>
+          <TTSButton text={`${title}。${story}`} label="听故事" size="sm" />
+        </div>
 
         {/* Story text with typewriter effect */}
         <div

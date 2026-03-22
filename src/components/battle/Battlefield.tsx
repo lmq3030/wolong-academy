@@ -2,20 +2,10 @@
 
 import { motion } from 'framer-motion';
 import type { BattleConfig } from '@/lib/levels/types';
+import type { BattlePhase } from '@/lib/engine/types';
 import { QiGauge } from './QiGauge';
 import { GeneralSprite } from './GeneralSprite';
 import { SoldierGroup } from './SoldierGroup';
-
-type BattlePhase =
-  | 'story_intro'
-  | 'challenge'
-  | 'validating'
-  | 'qi_charging'
-  | 'error_feedback'
-  | 'skill_ready'
-  | 'skill_animation'
-  | 'victory'
-  | 'rewards';
 
 interface BattlefieldProps {
   battle: BattleConfig;

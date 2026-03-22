@@ -2,17 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
-type BattlePhase =
-  | 'story_intro'
-  | 'challenge'
-  | 'validating'
-  | 'qi_charging'
-  | 'error_feedback'
-  | 'skill_ready'
-  | 'skill_animation'
-  | 'victory'
-  | 'rewards';
+import type { BattlePhase } from '@/lib/engine/types';
 
 interface GeneralSpriteProps {
   generalId: string;

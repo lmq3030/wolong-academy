@@ -81,10 +81,10 @@ describe('useLevelEngine', () => {
   });
 
   describe('initial state', () => {
-    it('starts with phase=story_intro, qi=0, stars=3', () => {
+    it('starts with phase=concept_intro, qi=0, stars=3', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
-      expect(result.current.state.phase).toBe('story_intro');
+      expect(result.current.state.phase).toBe('concept_intro');
       expect(result.current.state.qiPercent).toBe(0);
       expect(result.current.state.stars).toBe(3);
       expect(result.current.state.currentChallengeIndex).toBe(0);
@@ -104,23 +104,26 @@ describe('useLevelEngine', () => {
   });
 
   describe('nextPhase transitions', () => {
-    it('transitions from story_intro to challenge', () => {
+    it('transitions concept_intro → story_intro → challenge', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
       act(() => {
-        result.current.nextPhase();
+        result.current.nextPhase(); // concept_intro → story_intro
       });
+      expect(result.current.state.phase).toBe('story_intro');
 
+      act(() => {
+        result.current.nextPhase(); // story_intro → challenge
+      });
       expect(result.current.state.phase).toBe('challenge');
     });
 
     it('transitions from error_feedback back to challenge', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
-      // Move to challenge first
-      act(() => {
-        result.current.nextPhase();
-      });
+      // Move to challenge: concept_intro → story_intro → challenge
+      act(() => { result.current.nextPhase(); });
+      act(() => { result.current.nextPhase(); });
 
       // Submit wrong code to get to error_feedback
       act(() => {
@@ -144,7 +147,7 @@ describe('useLevelEngine', () => {
 
       // Move through the full flow: story -> challenge -> submit correct -> qi_charging -> skill_ready -> skill_animation
       act(() => {
-        result.current.nextPhase(); // story_intro -> challenge
+        result.current.nextPhase(); result.current.nextPhase(); // concept -> story -> challenge
       });
 
       act(() => {
@@ -197,7 +200,7 @@ describe('useLevelEngine', () => {
 
       // Get to victory state through full flow
       act(() => {
-        result.current.nextPhase(); // story -> challenge
+        result.current.nextPhase(); result.current.nextPhase(); // concept -> story -> challenge
       });
       act(() => {
         result.current.submitCode('print("hello")');
@@ -231,7 +234,7 @@ describe('useLevelEngine', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
       act(() => {
-        result.current.nextPhase(); // story_intro -> challenge
+        result.current.nextPhase(); result.current.nextPhase(); // concept -> story -> challenge
       });
 
       act(() => {
@@ -247,7 +250,7 @@ describe('useLevelEngine', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
       act(() => {
-        result.current.nextPhase(); // story -> challenge
+        result.current.nextPhase(); result.current.nextPhase(); // concept -> story -> challenge
       });
 
       act(() => {
@@ -627,13 +630,15 @@ describe('useLevelEngine', () => {
     it('completes the full level flow', () => {
       const { result } = renderHook(() => useLevelEngine(testChapter));
 
+      // Phase 0: concept_intro
+      expect(result.current.state.phase).toBe('concept_intro');
+      act(() => { result.current.nextPhase(); });
+
       // Phase 1: story_intro
       expect(result.current.state.phase).toBe('story_intro');
+      act(() => { result.current.nextPhase(); });
 
       // Phase 2: challenge
-      act(() => {
-        result.current.nextPhase();
-      });
       expect(result.current.state.phase).toBe('challenge');
 
       // Submit correct answer for challenge 1

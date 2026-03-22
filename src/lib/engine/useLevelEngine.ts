@@ -10,7 +10,7 @@ export function useLevelEngine(chapter: Chapter) {
   const { runCode, isReady: pyodideReady } = usePyodide();
 
   const [state, setState] = useState<LevelState>({
-    phase: 'story_intro',
+    phase: 'concept_intro',
     currentChallengeIndex: 0,
     qiPercent: 0,
     stars: 3, // Start at 3, deduct for errors/hints
@@ -91,6 +91,8 @@ export function useLevelEngine(chapter: Chapter) {
   const nextPhase = useCallback(() => {
     setState(prev => {
       switch (prev.phase) {
+        case 'concept_intro':
+          return { ...prev, phase: 'story_intro' as BattlePhase };
         case 'story_intro':
           return { ...prev, phase: 'challenge' as BattlePhase };
         case 'error_feedback':

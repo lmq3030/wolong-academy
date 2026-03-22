@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Chapter, Challenge, ChapterRewards } from '@/lib/levels/types';
 import { CodeEditorSwitch } from '@/components/editor/CodeEditorSwitch';
@@ -8,17 +9,9 @@ import { StoryIntro } from './StoryIntro';
 import { ErrorFeedback } from './ErrorFeedback';
 import { SkillAnimation } from './SkillAnimation';
 import { VictoryScreen } from './VictoryScreen';
-
-type BattlePhase =
-  | 'story_intro'
-  | 'challenge'
-  | 'validating'
-  | 'qi_charging'
-  | 'error_feedback'
-  | 'skill_ready'
-  | 'skill_animation'
-  | 'victory'
-  | 'rewards';
+import { ConceptLesson } from './ConceptLesson';
+import { concepts } from '@/lib/levels/concepts';
+import type { BattlePhase } from '@/lib/engine/types';
 
 interface BattleSceneProps {
   chapter: Chapter;
@@ -50,6 +43,14 @@ export function BattleScene({
   currentHint,
 }: BattleSceneProps) {
   const isEditorDisabled = phase !== 'challenge';
+  const chapterConcept = concepts.find(c => c.unlockedByChapter === chapter.id);
+
+  // Auto-skip concept_intro if no concept for this chapter
+  React.useEffect(() => {
+    if (phase === 'concept_intro' && !chapterConcept) {
+      onNextPhase();
+    }
+  }, [phase, chapterConcept, onNextPhase]);
 
   return (
     <div className="flex flex-col h-dvh w-full overflow-hidden" style={{ backgroundColor: 'var(--color-parchment)' }}>
@@ -144,6 +145,15 @@ export function BattleScene({
 
       {/* Phase overlays */}
       <AnimatePresence>
+        {phase === 'concept_intro' && chapterConcept && (
+          <ConceptLesson
+            key="concept"
+            concept={chapterConcept}
+            chapterTitle={chapter.title}
+            onReady={onNextPhase}
+          />
+        )}
+
         {phase === 'story_intro' && (
           <StoryIntro
             key="story"
