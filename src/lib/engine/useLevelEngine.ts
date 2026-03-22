@@ -41,10 +41,15 @@ export function useLevelEngine(chapter: Chapter) {
         const isLastChallenge =
           state.currentChallengeIndex >= chapter.challenges.length - 1;
 
+        // Get expected output for display
+        const expectedOutput = currentChallenge.testCases[0]?.expectedOutput || '';
+
         setState(prev => ({
           ...prev,
           qiPercent: newQi,
           phase: 'qi_charging',
+          lastCorrectCode: code,
+          lastCorrectOutput: expectedOutput,
         }));
 
         // After qi animation, transition
@@ -67,9 +72,11 @@ export function useLevelEngine(chapter: Chapter) {
           ...prev,
           phase: 'error_feedback',
           errorsUsed: prev.errorsUsed + 1,
-          stars: Math.max(1, prev.errorsUsed >= 2 ? prev.stars - 1 : prev.stars), // Lose star after 3 errors
+          stars: Math.max(1, prev.errorsUsed >= 2 ? prev.stars - 1 : prev.stars),
           errorMessage: result.error,
           errorLine: result.lineNumber,
+          lastCorrectCode: code,          // Store the attempted code for display
+          lastCorrectOutput: result.output || '', // Store actual output (or empty)
         }));
       }
     },

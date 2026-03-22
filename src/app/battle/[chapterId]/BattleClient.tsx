@@ -44,6 +44,8 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
       currentChallenge={engine.currentChallenge}
       errorMessage={engine.state.errorMessage}
       errorLine={engine.state.errorLine}
+      lastCode={engine.state.lastCorrectCode}
+      lastOutput={engine.state.lastCorrectOutput}
       rewards={engine.rewards}
       stars={engine.state.stars}
       currentHint={engine.state.currentHint}

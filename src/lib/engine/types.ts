@@ -27,4 +27,6 @@ export interface LevelState {
   currentHint?: string;
   errorMessage?: string;
   errorLine?: number;
+  lastCorrectCode?: string;
+  lastCorrectOutput?: string;
 }

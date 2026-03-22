@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 interface ErrorFeedbackProps {
   message: string;
   lineNumber?: number;
+  code?: string;
+  output?: string;
   onDismiss: () => void;
 }
 
-export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackProps) {
+export function ErrorFeedback({ message, lineNumber, code, output, onDismiss }: ErrorFeedbackProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [ttsState, setTtsState] = useState<'idle' | 'loading' | 'playing'>('idle');
 
@@ -104,6 +106,24 @@ export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackP
             >
               第{lineNumber}行的阵法还需调整
             </p>
+          )}
+
+          {/* Code + Output display */}
+          {code && (
+            <div className="mt-2 space-y-1.5">
+              <p className="text-xs" style={{ color: 'var(--color-bamboo)', fontFamily: 'serif' }}>你的代码：</p>
+              <div className="rounded-lg p-2 font-mono text-xs overflow-x-auto" style={{ backgroundColor: '#1e1e2e', color: '#cdd6f4' }}>
+                <pre className="whitespace-pre-wrap">{code}</pre>
+              </div>
+              {output && (
+                <>
+                  <p className="text-xs" style={{ color: 'var(--color-bamboo)', fontFamily: 'serif' }}>实际输出：</p>
+                  <div className="rounded-lg p-2 font-mono text-xs border" style={{ backgroundColor: 'rgba(196,30,58,0.05)', color: 'var(--color-shu-red)', borderColor: 'rgba(196,30,58,0.2)' }}>
+                    <pre className="whitespace-pre-wrap">{output}</pre>
+                  </div>
+                </>
+              )}
+            </div>
           )}
 
           {/* Action buttons row */}

@@ -10,6 +10,7 @@ import { ErrorFeedback } from './ErrorFeedback';
 import { SkillAnimation } from './SkillAnimation';
 import { VictoryScreen } from './VictoryScreen';
 import { ConceptLesson } from './ConceptLesson';
+import { CorrectFeedback } from './CorrectFeedback';
 import { concepts } from '@/lib/levels/concepts';
 import { TTSButton } from '@/components/ui/TTSButton';
 import type { BattlePhase } from '@/lib/engine/types';
@@ -21,6 +22,8 @@ interface BattleSceneProps {
   currentChallenge: Challenge;
   errorMessage?: string;
   errorLine?: number;
+  lastCode?: string;
+  lastOutput?: string;
   rewards?: ChapterRewards;
   stars?: number;
   onSubmitCode: (code: string) => void;
@@ -36,6 +39,8 @@ export function BattleScene({
   currentChallenge,
   errorMessage,
   errorLine,
+  lastCode,
+  lastOutput,
   rewards,
   stars = 3,
   onSubmitCode,
@@ -244,11 +249,21 @@ export function BattleScene({
           />
         )}
 
+        {phase === 'qi_charging' && lastCode && (
+          <CorrectFeedback
+            key="correct"
+            code={lastCode}
+            output={lastOutput || ''}
+          />
+        )}
+
         {phase === 'error_feedback' && errorMessage && (
           <ErrorFeedback
             key="error"
             message={errorMessage}
             lineNumber={errorLine}
+            code={lastCode}
+            output={lastOutput}
             onDismiss={onNextPhase}
           />
         )}
