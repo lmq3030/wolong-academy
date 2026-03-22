@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
 interface ErrorFeedbackProps {
@@ -9,52 +9,49 @@ interface ErrorFeedbackProps {
   onDismiss: () => void;
 }
 
-function useTTS(text: string) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    if (!text) return;
-
-    const speakText = `军师摇了摇羽扇说：${text}`;
-
-    // Call TTS API
-    fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: speakText }),
-    })
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.blob();
-      })
-      .then((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        setIsPlaying(true);
-        audio.play().catch(() => {}); // Autoplay may be blocked
-        audio.onended = () => {
-          setIsPlaying(false);
-          URL.revokeObjectURL(url);
-        };
-      })
-      .catch(() => {});
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, [text]);
-
-  return isPlaying;
-}
-
 export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackProps) {
-  const isPlaying = useTTS(message);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [ttsState, setTtsState] = useState<'idle' | 'loading' | 'playing'>('idle');
+
+  const playVoice = useCallback(async () => {
+    // If already playing, stop it
+    if (ttsState === 'playing' && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setTtsState('idle');
+      return;
+    }
+
+    setTtsState('loading');
+
+    try {
+      const speakText = `军师摇了摇羽扇说：${message}`;
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: speakText }),
+      });
+
+      if (!res.ok) {
+        setTtsState('idle');
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      setTtsState('playing');
+      await audio.play();
+      audio.onended = () => {
+        setTtsState('idle');
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+      };
+    } catch {
+      setTtsState('idle');
+    }
+  }, [message, ttsState]);
 
   return (
     <motion.div
@@ -109,19 +106,48 @@ export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackP
             </p>
           )}
 
-          {/* Try again button */}
-          <button
-            onClick={onDismiss}
-            className="mt-3 w-full py-2 rounded-lg text-white font-bold text-base transition-colors cursor-pointer"
-            style={{
-              backgroundColor: 'var(--color-shu-red)',
-              fontFamily: 'serif',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            再试一次
-          </button>
+          {/* Action buttons row */}
+          <div className="mt-3 flex gap-2">
+            {/* Play voice button */}
+            <button
+              onClick={playVoice}
+              className="flex-1 py-2 rounded-lg font-bold text-base transition-all cursor-pointer flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: ttsState === 'playing' ? 'var(--color-wu-green)' : 'var(--color-gold)',
+                color: ttsState === 'playing' ? 'white' : 'var(--color-ink)',
+                fontFamily: 'serif',
+              }}
+            >
+              {ttsState === 'loading' ? (
+                <>
+                  <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  加载中...
+                </>
+              ) : ttsState === 'playing' ? (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                  暂停
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 22v-20l18 10-18 10z" /></svg>
+                  听军师讲解
+                </>
+              )}
+            </button>
+
+            {/* Try again button */}
+            <button
+              onClick={onDismiss}
+              className="flex-1 py-2 rounded-lg text-white font-bold text-base transition-colors cursor-pointer"
+              style={{
+                backgroundColor: 'var(--color-shu-red)',
+                fontFamily: 'serif',
+              }}
+            >
+              再试一次
+            </button>
+          </div>
 
           {/* Speech bubble triangle pointing to advisor */}
           <div
@@ -136,7 +162,7 @@ export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackP
 
         {/* Advisor portrait — Zhuge Liang */}
         <div
-          className={`flex-shrink-0 rounded-full border-3 shadow-md overflow-hidden ${isPlaying ? 'ring-2 ring-green-400 ring-offset-2' : ''}`}
+          className={`flex-shrink-0 rounded-full border-3 shadow-md overflow-hidden transition-shadow ${ttsState === 'playing' ? 'ring-2 ring-green-400 ring-offset-2' : ''}`}
           style={{
             width: 64,
             height: 64,
@@ -148,7 +174,6 @@ export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackP
             alt="诸葛亮"
             className="w-full h-full object-cover"
             onError={(e) => {
-              // Fallback to text if image missing
               const el = e.currentTarget;
               el.style.display = 'none';
               el.parentElement!.style.backgroundColor = 'var(--color-wu-green)';
