@@ -73,8 +73,10 @@ describe('ErrorFeedback', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('shows advisor portrait with "诸葛" text', () => {
+  it('shows advisor portrait (zhuge-liang image)', () => {
     render(<ErrorFeedback {...defaultProps} />);
-    expect(screen.getByText('诸葛')).toBeInTheDocument();
+    const img = screen.getByAltText('诸葛亮');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', '/assets/generals/zhuge-liang.png');
   });
 });

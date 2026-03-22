@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface ErrorFeedbackProps {
@@ -8,7 +9,53 @@ interface ErrorFeedbackProps {
   onDismiss: () => void;
 }
 
+function useTTS(text: string) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!text) return;
+
+    const speakText = `军师摇了摇羽扇说：${text}`;
+
+    // Call TTS API
+    fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: speakText }),
+    })
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        setIsPlaying(true);
+        audio.play().catch(() => {}); // Autoplay may be blocked
+        audio.onended = () => {
+          setIsPlaying(false);
+          URL.revokeObjectURL(url);
+        };
+      })
+      .catch(() => {});
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [text]);
+
+  return isPlaying;
+}
+
 export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackProps) {
+  const isPlaying = useTTS(message);
+
   return (
     <motion.div
       className="fixed inset-0 z-40 flex items-center justify-end pointer-events-none"
@@ -87,18 +134,27 @@ export function ErrorFeedback({ message, lineNumber, onDismiss }: ErrorFeedbackP
           />
         </div>
 
-        {/* Advisor portrait */}
+        {/* Advisor portrait — Zhuge Liang */}
         <div
-          className="flex-shrink-0 flex items-center justify-center rounded-full border-3 shadow-md"
+          className={`flex-shrink-0 rounded-full border-3 shadow-md overflow-hidden ${isPlaying ? 'ring-2 ring-green-400 ring-offset-2' : ''}`}
           style={{
             width: 64,
             height: 64,
-            backgroundColor: 'var(--color-wu-green)',
             borderColor: 'var(--color-gold)',
-            fontFamily: 'serif',
           }}
         >
-          <span className="text-white font-bold text-lg">诸葛</span>
+          <img
+            src="/assets/generals/zhuge-liang.png"
+            alt="诸葛亮"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to text if image missing
+              const el = e.currentTarget;
+              el.style.display = 'none';
+              el.parentElement!.style.backgroundColor = 'var(--color-wu-green)';
+              el.parentElement!.innerHTML = '<span class="text-white font-bold text-lg" style="font-family:serif;display:flex;align-items:center;justify-content:center;width:100%;height:100%">诸葛</span>';
+            }}
+          />
         </div>
       </motion.div>
     </motion.div>
