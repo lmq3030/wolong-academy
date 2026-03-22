@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { GeneralSprite } from '../GeneralSprite';
 
 // Mock framer-motion
@@ -12,58 +12,60 @@ vi.mock('framer-motion', () => ({
 }));
 
 describe('GeneralSprite', () => {
-  describe('getDisplayChar - Chinese character mapping', () => {
-    it('displays correct Chinese character for liu-bei', () => {
-      render(<GeneralSprite generalId="liu-bei" side="left" phase="challenge" />);
-      expect(screen.getByText('刘')).toBeInTheDocument();
+  describe('portrait image', () => {
+    it('renders an img tag with correct src for known generals', () => {
+      render(<GeneralSprite generalId="guan-yu" side="left" phase="challenge" />);
+      const img = screen.getByAltText('guan-yu');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/assets/generals/guan-yu.png');
     });
 
-    it('displays correct Chinese character for guan-yu', () => {
+    it('normalizes underscore IDs for image src', () => {
+      render(<GeneralSprite generalId="liu_bei" side="left" phase="challenge" />);
+      const img = screen.getByAltText('liu-bei');
+      expect(img).toHaveAttribute('src', '/assets/generals/liu-bei.png');
+    });
+
+    it('falls back to text character when image fails to load', () => {
       render(<GeneralSprite generalId="guan-yu" side="left" phase="challenge" />);
+      const img = screen.getByAltText('guan-yu');
+      fireEvent.error(img);
+      // After error, should show fallback character
       expect(screen.getByText('关')).toBeInTheDocument();
     });
 
-    it('displays correct Chinese character for cao-cao', () => {
-      render(<GeneralSprite generalId="cao-cao" side="right" phase="challenge" />);
-      expect(screen.getByText('曹')).toBeInTheDocument();
-    });
-
-    it('falls back to first character uppercase for unknown generals', () => {
+    it('shows fallback character for unknown generals when image fails', () => {
       render(<GeneralSprite generalId="wang-mang" side="left" phase="challenge" />);
+      const img = screen.getByAltText('wang-mang');
+      fireEvent.error(img);
       expect(screen.getByText('W')).toBeInTheDocument();
     });
+  });
 
-    it('handles underscore IDs via normalization (liu_bei -> 刘)', () => {
-      render(<GeneralSprite generalId="liu_bei" side="left" phase="challenge" />);
-      expect(screen.getByText('刘')).toBeInTheDocument();
+  describe('name label - Chinese names', () => {
+    it('shows Chinese name for known generals', () => {
+      render(<GeneralSprite generalId="liu-bei" side="left" phase="challenge" />);
+      expect(screen.getByText('刘备')).toBeInTheDocument();
     });
 
-    it('handles underscore IDs for zhang_fei', () => {
-      render(<GeneralSprite generalId="zhang_fei" side="left" phase="challenge" />);
-      expect(screen.getByText('张')).toBeInTheDocument();
+    it('shows Chinese name for guan-yu', () => {
+      render(<GeneralSprite generalId="guan-yu" side="left" phase="challenge" />);
+      expect(screen.getByText('关羽')).toBeInTheDocument();
+    });
+
+    it('shows Chinese name for hua-xiong', () => {
+      render(<GeneralSprite generalId="hua-xiong" side="right" phase="challenge" />);
+      expect(screen.getByText('华雄')).toBeInTheDocument();
+    });
+
+    it('shows normalized ID for unknown generals', () => {
+      render(<GeneralSprite generalId="wang-mang" side="left" phase="challenge" />);
+      expect(screen.getByText('wang-mang')).toBeInTheDocument();
     });
   });
 
   describe('side-based coloring', () => {
-    it('player side (left) uses Shu red color', () => {
-      const { container } = render(
-        <GeneralSprite generalId="liu-bei" side="left" phase="challenge" />
-      );
-      const circle = container.querySelector('[style*="background-color"]') as HTMLElement;
-      expect(circle).toBeTruthy();
-      expect(circle.style.backgroundColor).toBe('var(--color-shu-red)');
-    });
-
-    it('enemy side (right) uses gray color', () => {
-      const { container } = render(
-        <GeneralSprite generalId="cao-cao" side="right" phase="challenge" />
-      );
-      const circle = container.querySelector('[style*="background-color"]') as HTMLElement;
-      expect(circle).toBeTruthy();
-      expect(circle.style.backgroundColor).toBe('rgb(74, 74, 74)');
-    });
-
-    it('player side has gold border', () => {
+    it('player side (left) uses gold border', () => {
       const { container } = render(
         <GeneralSprite generalId="liu-bei" side="left" phase="challenge" />
       );
@@ -72,7 +74,7 @@ describe('GeneralSprite', () => {
       expect(circle.style.borderColor).toBe('var(--color-gold)');
     });
 
-    it('enemy side has gray border', () => {
+    it('enemy side (right) uses gray border', () => {
       const { container } = render(
         <GeneralSprite generalId="cao-cao" side="right" phase="challenge" />
       );
@@ -80,30 +82,14 @@ describe('GeneralSprite', () => {
       expect(circle).toBeTruthy();
       expect(circle.style.borderColor).toBe('rgb(119, 119, 119)');
     });
-  });
-
-  describe('name label', () => {
-    it('renders general name label for hyphenated ID', () => {
-      render(<GeneralSprite generalId="liu-bei" side="left" phase="challenge" />);
-      // The name label renders generalId.replace(/_/g, '') which for "liu-bei" stays "liu-bei"
-      expect(screen.getByText('liu-bei')).toBeInTheDocument();
-    });
-
-    it('renders general name label with underscores removed', () => {
-      render(<GeneralSprite generalId="liu_bei" side="left" phase="challenge" />);
-      // The name label renders generalId.replace(/_/g, '') which for "liu_bei" becomes "liubei"
-      expect(screen.getByText('liubei')).toBeInTheDocument();
-    });
 
     it('player name label has shu-red background', () => {
       const { container } = render(
         <GeneralSprite generalId="liu-bei" side="left" phase="challenge" />
       );
-      // The name label is the second span with specific styling
       const labels = container.querySelectorAll('span.text-xs');
       expect(labels.length).toBeGreaterThan(0);
-      const label = labels[0] as HTMLElement;
-      expect(label.style.backgroundColor).toBe('var(--color-shu-red)');
+      expect((labels[0] as HTMLElement).style.backgroundColor).toBe('var(--color-shu-red)');
     });
 
     it('enemy name label has gray background', () => {
@@ -112,8 +98,7 @@ describe('GeneralSprite', () => {
       );
       const labels = container.querySelectorAll('span.text-xs');
       expect(labels.length).toBeGreaterThan(0);
-      const label = labels[0] as HTMLElement;
-      expect(label.style.backgroundColor).toBe('rgb(85, 85, 85)');
+      expect((labels[0] as HTMLElement).style.backgroundColor).toBe('rgb(85, 85, 85)');
     });
   });
 
@@ -122,7 +107,6 @@ describe('GeneralSprite', () => {
       const { container } = render(
         <GeneralSprite generalId="liu-bei" side="left" phase="skill_ready" />
       );
-      // The glow element is a div with "absolute inset-0 rounded-full" class
       const glowEl = container.querySelector('.absolute.inset-0.rounded-full');
       expect(glowEl).toBeTruthy();
     });

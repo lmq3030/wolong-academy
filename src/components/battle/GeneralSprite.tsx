@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 type BattlePhase =
@@ -19,36 +20,39 @@ interface GeneralSpriteProps {
   phase: BattlePhase;
 }
 
-/**
- * Map a general ID to its display character (first character of the name).
- * For now, uses a hardcoded lookup; real data will come from a generals registry.
- */
-const GENERAL_NAME_MAP: Record<string, string> = {
-  'guan-yu': '关',
-  'zhang-fei': '张',
-  'liu-bei': '刘',
-  'zhao-yun': '赵',
-  'zhuge-liang': '诸',
-  'cao-cao': '曹',
-  'xiahou-dun': '夏',
-  'lu-bu': '吕',
-  'sun-ce': '孙',
-  'zhou-yu': '周',
-  'huang-zhong': '黄',
-  'ma-chao': '马',
-  'diao-chan': '貂',
-  'sun-quan': '权',
-  'lu-su': '鲁',
-  'huang-gai': '盖',
-  'sima-yi': '司',
-  'jiang-wei': '姜',
-  'meng-huo': '孟',
+/** Map general IDs to Chinese names for display */
+const GENERAL_NAMES: Record<string, string> = {
+  'guan-yu': '关羽',
+  'zhang-fei': '张飞',
+  'liu-bei': '刘备',
+  'zhao-yun': '赵云',
+  'zhuge-liang': '诸葛亮',
+  'cao-cao': '曹操',
+  'xiahou-dun': '夏侯惇',
+  'lu-bu': '吕布',
+  'sun-ce': '孙策',
+  'zhou-yu': '周瑜',
+  'huang-zhong': '黄忠',
+  'ma-chao': '马超',
+  'diao-chan': '貂蝉',
+  'sun-quan': '孙权',
+  'lu-su': '鲁肃',
+  'huang-gai': '黄盖',
+  'sima-yi': '司马懿',
+  'jiang-wei': '姜维',
+  'meng-huo': '孟获',
+  'hua-xiong': '华雄',
 };
 
 function getDisplayChar(generalId: string): string {
-  // Support both hyphenated (liu-bei) and underscored (liu_bei) IDs
   const normalized = generalId.replace(/_/g, '-');
-  return GENERAL_NAME_MAP[normalized] || generalId.charAt(0).toUpperCase();
+  const name = GENERAL_NAMES[normalized];
+  return name ? name[0] : generalId.charAt(0).toUpperCase();
+}
+
+function getDisplayName(generalId: string): string {
+  const normalized = generalId.replace(/_/g, '-');
+  return GENERAL_NAMES[normalized] || normalized;
 }
 
 function getPhaseAnimation(phase: BattlePhase, side: 'left' | 'right') {
@@ -98,34 +102,48 @@ function getPhaseAnimation(phase: BattlePhase, side: 'left' | 'right') {
 
 export function GeneralSprite({ generalId, side, phase }: GeneralSpriteProps) {
   const displayChar = getDisplayChar(generalId);
+  const normalizedId = generalId.replace(/_/g, '-');
   const isPlayer = side === 'left';
   const anim = getPhaseAnimation(phase, side);
+  const [imgError, setImgError] = useState(false);
+
+  // Try to load portrait from /assets/generals/{id}.png
+  const portraitSrc = `/assets/generals/${normalizedId}.png`;
 
   return (
     <motion.div
       className="flex flex-col items-center gap-1"
       {...anim}
     >
-      {/* Character circle */}
+      {/* Character portrait */}
       <div
-        className="relative flex items-center justify-center rounded-full border-3 shadow-lg select-none"
+        className="relative rounded-full border-3 shadow-lg select-none overflow-hidden"
         style={{
-          width: 80,
-          height: 80,
-          backgroundColor: isPlayer ? 'var(--color-shu-red)' : '#4a4a4a',
+          width: 90,
+          height: 90,
           borderColor: isPlayer ? 'var(--color-gold)' : '#777',
-          transform: side === 'right' ? 'scaleX(-1)' : undefined,
+          backgroundColor: isPlayer ? 'var(--color-shu-red)' : '#4a4a4a',
         }}
       >
-        <span
-          className="text-3xl font-bold text-white"
-          style={{
-            fontFamily: 'serif',
-            transform: side === 'right' ? 'scaleX(-1)' : undefined,
-          }}
-        >
-          {displayChar}
-        </span>
+        {!imgError ? (
+          <img
+            src={portraitSrc}
+            alt={normalizedId}
+            className="w-full h-full object-cover"
+            draggable={false}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          /* Fallback: text character */
+          <div className="w-full h-full flex items-center justify-center">
+            <span
+              className="text-3xl font-bold text-white"
+              style={{ fontFamily: 'serif' }}
+            >
+              {displayChar}
+            </span>
+          </div>
+        )}
 
         {/* Glow for skill_ready */}
         {phase === 'skill_ready' && (
@@ -148,7 +166,7 @@ export function GeneralSprite({ generalId, side, phase }: GeneralSpriteProps) {
           fontFamily: 'serif',
         }}
       >
-        {generalId.replace(/_/g, '')}
+        {getDisplayName(generalId)}
       </span>
     </motion.div>
   );
