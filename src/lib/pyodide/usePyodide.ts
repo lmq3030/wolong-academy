@@ -13,7 +13,15 @@ export function usePyodide() {
     reject: (error: Error) => void;
   }>>(new Map());
 
-  useEffect(() => {
+  const initWorker = useCallback(() => {
+    // Terminate existing worker if any
+    if (workerRef.current) {
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+
+    setStatus('loading');
+
     const worker = new Worker('/pyodide-worker.js');
     workerRef.current = worker;
 
@@ -35,12 +43,18 @@ export function usePyodide() {
     worker.onerror = () => {
       setStatus('error');
     };
+  }, []);
+
+  useEffect(() => {
+    initWorker();
 
     return () => {
-      worker.terminate();
-      workerRef.current = null;
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
     };
-  }, []);
+  }, [initWorker]);
 
   const runCode = useCallback(async (code: string, timeout = 5000): Promise<PyodideResult> => {
     if (!workerRef.current || status !== 'ready') {
@@ -59,7 +73,8 @@ export function usePyodide() {
       pendingRef.current.set(id, { resolve, reject: () => {} });
       workerRef.current!.postMessage({ id, type: 'run', code, timeout });
 
-      // Safety timeout (worker timeout + buffer)
+      // Safety timeout — if worker is blocked (e.g. infinite loop),
+      // terminate and recreate it so subsequent runs work
       setTimeout(() => {
         if (pendingRef.current.has(id)) {
           pendingRef.current.delete(id);
@@ -67,13 +82,15 @@ export function usePyodide() {
             id,
             success: false,
             output: '',
-            error: '代码执行超时',
+            error: '代码执行超时（可能存在无限循环）。Python环境已重置。',
             duration: timeout,
           });
+          // Terminate the blocked worker and create a fresh one
+          initWorker();
         }
       }, timeout + 1000);
     });
-  }, [status]);
+  }, [status, initWorker]);
 
   return {
     status,

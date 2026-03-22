@@ -303,12 +303,14 @@ export function BattleScene({
         )}
       </AnimatePresence>
 
-      {/* Python REPL */}
-      <PythonRepl
-        isOpen={showRepl}
-        onClose={() => setShowRepl(false)}
-        initialCode={currentChallenge.codeTemplate || currentChallenge.correctAnswer}
-      />
+      {/* Python REPL — lazy-mounted to avoid duplicate Pyodide workers */}
+      {showRepl && (
+        <PythonRepl
+          isOpen={showRepl}
+          onClose={() => setShowRepl(false)}
+          initialCode={currentChallenge.codeTemplate || currentChallenge.correctAnswer}
+        />
+      )}
     </div>
   );
 }

@@ -1,14 +1,38 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLevelEngine } from '@/lib/engine/useLevelEngine';
 import { BattleScene } from '@/components/battle/BattleScene';
-import { saveChapterProgress, addXP, unlockGenerals } from '@/lib/progress';
+import { saveChapterProgress, addXP, unlockGenerals, isChapterUnlocked, getProgress } from '@/lib/progress';
+import { chapters as allChapters } from '@/lib/levels';
 import type { Chapter } from '@/lib/levels/types';
 
 export function BattleClient({ chapter }: { chapter: Chapter }) {
   const router = useRouter();
   const engine = useLevelEngine(chapter);
+  const [accessChecked, setAccessChecked] = useState(false);
+
+  // Check if chapter is unlocked — redirect to map if not
+  useEffect(() => {
+    const sortedIds = Object.values(allChapters)
+      .sort((a, b) => a.act !== b.act ? a.act - b.act : a.id.localeCompare(b.id))
+      .map(c => c.id);
+    const progress = getProgress();
+    if (!isChapterUnlocked(chapter.id, sortedIds, progress.completedChapters)) {
+      router.replace('/map');
+    } else {
+      setAccessChecked(true);
+    }
+  }, [chapter.id, router]);
+
+  if (!accessChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-parchment)' }}>
+        <p style={{ color: 'var(--color-ink)', fontFamily: 'serif' }}>军师正在布阵...</p>
+      </div>
+    );
+  }
 
   const handleNextPhase = () => {
     if (engine.state.phase === 'victory') {

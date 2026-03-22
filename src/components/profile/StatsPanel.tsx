@@ -137,12 +137,12 @@ function StatCard({ icon, label, value, suffix, detail, color, bgColor, index }:
 
 /* ─── Main Component ─────────────────────────────────────────────────── */
 
-export function StatsPanel() {
+export function StatsPanel({ refreshKey }: { refreshKey?: number }) {
   const [progress, setProgress] = useState<LocalProgress | null>(null);
 
   useEffect(() => {
     setProgress(getProgress());
-  }, []);
+  }, [refreshKey]);
 
   if (!progress) return null;
 

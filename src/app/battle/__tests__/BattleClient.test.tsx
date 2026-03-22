@@ -6,8 +6,9 @@ import type { Chapter, Challenge, ChapterRewards } from '@/lib/levels/types';
 // ---- Mocks ----
 
 const pushMock = vi.fn();
+const replaceMock = vi.fn();
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => ({ push: pushMock, replace: replaceMock }),
 }));
 
 const nextPhaseMock = vi.fn();
@@ -34,6 +35,12 @@ vi.mock('@/lib/progress', () => ({
   saveChapterProgress: vi.fn(),
   addXP: vi.fn(),
   unlockGenerals: vi.fn(),
+  isChapterUnlocked: vi.fn(() => true),
+  getProgress: vi.fn(() => ({ completedChapters: {}, unlockedGenerals: [], xp: 0, level: 1 })),
+}));
+
+vi.mock('@/lib/levels', () => ({
+  chapters: { 'chapter-00': { id: 'chapter-00', act: 1 } },
 }));
 
 // ---- Helpers ----

@@ -60,9 +60,11 @@ function XPBar({ xp, level }: { xp: number; level: number }) {
 export default function ProfilePage() {
   const [progress, setProgress] = useState<LocalProgress | null>(null);
   const [playerName, setPlayerName] = useState('小军师');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadUserData = () => {
     setProgress(getProgress());
+    setRefreshKey(k => k + 1);
     const user = getCurrentUser();
     if (user) {
       setPlayerName(user.username);
@@ -149,7 +151,7 @@ export default function ProfilePage() {
           transition={{ delay: 0.15, duration: 0.4 }}
         >
           <h3 className="text-lg font-bold text-ink mb-3">战绩一览</h3>
-          <StatsPanel />
+          <StatsPanel refreshKey={refreshKey} />
         </motion.div>
 
         {/* ── Achievement List ────────────────────────────────────── */}
