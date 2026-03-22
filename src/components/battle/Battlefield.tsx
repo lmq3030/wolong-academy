@@ -39,18 +39,18 @@ export function Battlefield({ battle, qiPercent, phase }: BattlefieldProps) {
       className="relative w-full overflow-hidden"
       style={{
         height: 350,
-        background: battle.bgScene
-          ? `url(${battle.bgScene}) center/cover no-repeat`
-          : `linear-gradient(
-              180deg,
-              #87CEEB 0%,
-              #B0D4E8 30%,
-              #8FBC8F 40%,
-              #6B8E6B 60%,
-              #5A7A5A 100%
-            )`,
+        background: `linear-gradient(180deg, #87CEEB 0%, #B0D4E8 30%, #8FBC8F 40%, #6B8E6B 60%, #5A7A5A 100%)`,
       }}
     >
+      {/* Background image as <img> for reliable loading */}
+      {battle.bgScene && (
+        <img
+          src={battle.bgScene}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          draggable={false}
+        />
+      )}
       {/* Terrain/ground overlay for depth */}
       <div
         className="absolute bottom-0 left-0 right-0"
