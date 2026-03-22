@@ -14,6 +14,7 @@ import { CorrectFeedback } from './CorrectFeedback';
 import { PythonRepl } from './PythonRepl';
 import { concepts } from '@/lib/levels/concepts';
 import { TTSButton } from '@/components/ui/TTSButton';
+import Link from 'next/link';
 import type { BattlePhase } from '@/lib/engine/types';
 
 interface BattleSceneProps {
@@ -63,6 +64,15 @@ export function BattleScene({
 
   return (
     <div className="flex flex-col h-dvh w-full overflow-hidden" style={{ backgroundColor: 'var(--color-parchment)' }}>
+      {/* Map navigation button (top-left) */}
+      <Link
+        href="/map"
+        className="absolute top-3 left-3 z-30 px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-all hover:bg-white/80 bg-white/60 backdrop-blur-sm border"
+        style={{ color: 'var(--color-ink)', borderColor: 'var(--color-bamboo)', fontFamily: 'serif' }}
+      >
+        ← 地图
+      </Link>
+
       {/* Top ~45%: Battlefield */}
       <div className="flex-none" style={{ height: '45%' }}>
         <Battlefield
@@ -271,6 +281,7 @@ export function BattleScene({
             key="correct"
             code={lastCode}
             output={lastOutput || ''}
+            onContinue={onNextPhase}
           />
         )}
 

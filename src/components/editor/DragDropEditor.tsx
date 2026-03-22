@@ -1,9 +1,24 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { EditorProps } from './types';
 import type { DragOption } from '@/lib/levels/types';
+
+/** Shuffle array using Fisher-Yates (deterministic per challenge via seed) */
+function shuffleArray<T>(arr: T[], seed: string): T[] {
+  const result = [...arr];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  for (let i = result.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash + i) | 0;
+    const j = Math.abs(hash) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 
 interface SlotState {
   /** The DragOption placed in this slot, or null if empty */
@@ -20,7 +35,9 @@ export function DragDropEditor({
   onPartialProgress,
   disabled = false,
 }: EditorProps) {
-  const dragOptions = challenge.dragOptions ?? [];
+  const rawOptions = challenge.dragOptions ?? [];
+  // Randomize option order (stable per challenge id)
+  const dragOptions = useMemo(() => shuffleArray(rawOptions, challenge.id), [rawOptions, challenge.id]);
 
   // Determine how many slots we need from the drag options
   const slotCount = dragOptions.reduce((max, opt) => {
@@ -256,7 +273,7 @@ export function DragDropEditor({
                 onClick={() => !isPlaced && handleOptionClick(option.id)}
                 className={`
                   px-5 py-3 rounded-full font-mono text-base
-                  border-2 select-none
+                  border-2
                   transition-all duration-200
                   min-h-[48px]
                   ${

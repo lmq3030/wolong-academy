@@ -51,22 +51,7 @@ export function useLevelEngine(chapter: Chapter) {
           lastCorrectCode: code,
           lastCorrectOutput: expectedOutput,
         }));
-
-        // After qi animation, transition
-        setTimeout(() => {
-          if (newQi >= 100 || isLastChallenge) {
-            setState(prev => ({ ...prev, phase: 'skill_ready' }));
-            setTimeout(() => {
-              setState(prev => ({ ...prev, phase: 'skill_animation' }));
-            }, 500);
-          } else {
-            setState(prev => ({
-              ...prev,
-              phase: 'challenge',
-              currentChallengeIndex: prev.currentChallengeIndex + 1,
-            }));
-          }
-        }, 1000); // 1s for qi charging animation
+        // qi_charging now waits for user to click "继续" via nextPhase()
       } else {
         setState(prev => ({
           ...prev,
@@ -102,6 +87,22 @@ export function useLevelEngine(chapter: Chapter) {
           return { ...prev, phase: 'story_intro' as BattlePhase };
         case 'story_intro':
           return { ...prev, phase: 'challenge' as BattlePhase };
+        case 'qi_charging': {
+          // User clicked "继续" on correct feedback — advance to next challenge or skill
+          const isLast = prev.currentChallengeIndex >= chapter.challenges.length - 1;
+          if (prev.qiPercent >= 100 || isLast) {
+            return { ...prev, phase: 'skill_ready' as BattlePhase };
+          }
+          return {
+            ...prev,
+            phase: 'challenge' as BattlePhase,
+            currentChallengeIndex: prev.currentChallengeIndex + 1,
+            lastCorrectCode: undefined,
+            lastCorrectOutput: undefined,
+          };
+        }
+        case 'skill_ready':
+          return { ...prev, phase: 'skill_animation' as BattlePhase };
         case 'error_feedback':
           return {
             ...prev,

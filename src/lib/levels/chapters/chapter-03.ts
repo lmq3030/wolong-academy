@@ -75,7 +75,7 @@ export const chapter03: Chapter = {
         '填入"else"——不是董卓也不是吕布，就走else这条路',
       ],
       qiReward: 40,
-      choices: ['else', 'elif person == "王允"', 'if'],
+      choices: ['else', 'elif person == "貂蝉"', 'if'],
     },
   ],
   battle: {

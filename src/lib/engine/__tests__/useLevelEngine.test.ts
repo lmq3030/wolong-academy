@@ -159,7 +159,7 @@ describe('useLevelEngine', () => {
 
       // Advance timers: 1000ms for qi_charging
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
 
       // After first challenge, qi=50, not 100, so goes to next challenge
@@ -175,14 +175,14 @@ describe('useLevelEngine', () => {
 
       // qi_charging -> skill_ready (after 1000ms)
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
 
       expect(result.current.state.phase).toBe('skill_ready');
 
       // skill_ready -> skill_animation (after 500ms)
       act(() => {
-        vi.advanceTimersByTime(500);
+        result.current.nextPhase(); // skill_ready -> skill_animation
       });
 
       expect(result.current.state.phase).toBe('skill_animation');
@@ -206,16 +206,16 @@ describe('useLevelEngine', () => {
         result.current.submitCode('print("hello")');
       });
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
       act(() => {
         result.current.submitCode('x = 1');
       });
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
       act(() => {
-        vi.advanceTimersByTime(500);
+        result.current.nextPhase(); // skill_ready -> skill_animation
       });
       act(() => {
         result.current.nextPhase(); // skill_animation -> victory
@@ -310,7 +310,7 @@ describe('useLevelEngine', () => {
       });
 
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
 
       expect(result.current.state.phase).toBe('challenge');
@@ -503,20 +503,20 @@ describe('useLevelEngine', () => {
 
       // Challenge 1: qi=30
       act(() => { result.current.submitCode('print("a")'); });
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => { result.current.nextPhase(); });
       expect(result.current.state.phase).toBe('challenge');
       expect(result.current.state.qiPercent).toBe(30);
 
       // Challenge 2: qi=60
       act(() => { result.current.submitCode('print("b")'); });
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => { result.current.nextPhase(); });
       expect(result.current.state.phase).toBe('challenge');
       expect(result.current.state.qiPercent).toBe(60);
 
       // Challenge 3 (LAST): qi=90, below 100 but should still trigger skill_ready
       act(() => { result.current.submitCode('print("c")'); });
       expect(result.current.state.qiPercent).toBe(90);
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => { result.current.nextPhase(); });
       expect(result.current.state.phase).toBe('skill_ready');
     });
 
@@ -555,7 +555,7 @@ describe('useLevelEngine', () => {
       // Challenge 1: qi=80
       act(() => { result.current.submitCode('print("a")'); });
       expect(result.current.state.qiPercent).toBe(80);
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => { result.current.nextPhase(); });
 
       // Challenge 2: qi should clamp to 100, not 130
       act(() => { result.current.submitCode('print("b")'); });
@@ -650,7 +650,7 @@ describe('useLevelEngine', () => {
 
       // qi_charging -> next challenge (qi < 100)
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
       expect(result.current.state.phase).toBe('challenge');
       expect(result.current.state.currentChallengeIndex).toBe(1);
@@ -664,13 +664,13 @@ describe('useLevelEngine', () => {
 
       // qi_charging -> skill_ready (qi = 100)
       act(() => {
-        vi.advanceTimersByTime(1000);
+        result.current.nextPhase(); // qi_charging -> next
       });
       expect(result.current.state.phase).toBe('skill_ready');
 
       // skill_ready -> skill_animation
       act(() => {
-        vi.advanceTimersByTime(500);
+        result.current.nextPhase(); // skill_ready -> skill_animation
       });
       expect(result.current.state.phase).toBe('skill_animation');
 

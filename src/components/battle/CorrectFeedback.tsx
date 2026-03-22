@@ -5,23 +5,27 @@ import { motion } from 'framer-motion';
 interface CorrectFeedbackProps {
   code: string;
   output: string;
+  onContinue: () => void;
 }
 
 /**
  * Shows the code and its execution output when the answer is correct.
- * Displayed during the qi_charging phase to give kids feedback on what their code does.
+ * Stays until user clicks "继续".
  */
-export function CorrectFeedback({ code, output }: CorrectFeedbackProps) {
+export function CorrectFeedback({ code, output, onContinue }: CorrectFeedbackProps) {
   return (
     <motion.div
-      className="fixed inset-0 z-35 flex items-center justify-center pointer-events-none"
+      className="fixed inset-0 z-40 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/20" />
+
       <motion.div
-        className="w-full max-w-md mx-4 rounded-xl shadow-2xl overflow-hidden border-2 pointer-events-auto"
+        className="relative w-full max-w-md mx-4 rounded-xl shadow-2xl overflow-hidden border-2"
         style={{
           backgroundColor: 'var(--color-parchment)',
           borderColor: 'var(--color-wu-green)',
@@ -51,13 +55,13 @@ export function CorrectFeedback({ code, output }: CorrectFeedbackProps) {
             className="rounded-lg p-3 font-mono text-sm overflow-x-auto"
             style={{ backgroundColor: '#1e1e2e', color: '#cdd6f4' }}
           >
-            <pre className="whitespace-pre-wrap">{code}</pre>
+            <pre className="whitespace-pre-wrap select-text">{code}</pre>
           </div>
         </div>
 
         {/* Output display */}
         {output && (
-          <div className="px-4 pb-3">
+          <div className="px-4 pb-2">
             <p className="text-xs font-bold mb-1" style={{ color: 'var(--color-bamboo)', fontFamily: 'serif' }}>
               运行输出：
             </p>
@@ -82,6 +86,20 @@ export function CorrectFeedback({ code, output }: CorrectFeedbackProps) {
             </div>
           </div>
         )}
+
+        {/* Continue button */}
+        <div className="px-4 py-3">
+          <button
+            onClick={onContinue}
+            className="w-full py-2.5 rounded-lg text-white font-bold text-base cursor-pointer transition-transform active:scale-95"
+            style={{
+              backgroundColor: 'var(--color-wu-green)',
+              fontFamily: 'serif',
+            }}
+          >
+            继续
+          </button>
+        </div>
       </motion.div>
     </motion.div>
   );

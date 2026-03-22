@@ -71,7 +71,7 @@ export const chapter01: Chapter = {
     {
       id: 'ch01-c3',
       type: 'fill_blank',
-      prompt: '战斗结束了！请在空白处填入正确的内容，用变量拼出战果。',
+      prompt: '战斗结束了！用变量名（不是文字）来拼出战果。提示：变量不需要加引号！',
       codeTemplate: 'hero = "关羽"\nenemy = "华雄"\nresult = hero + "斩了" + ___\nprint(result)',
       correctAnswer: 'hero = "关羽"\nenemy = "华雄"\nresult = hero + "斩了" + enemy\nprint(result)',
       testCases: [
@@ -81,12 +81,12 @@ export const chapter01: Chapter = {
         },
       ],
       hints: [
-        '我们已经把华雄的名字存在了一个变量里，想想该用哪个变量呢？',
-        '变量名直接写就好，不需要加引号。加了引号就变成普通文字了哦！',
-        '填入 enemy（不加引号）。enemy 是变量，值为"华雄"；写 "enemy" 则会输出文字"enemy"。',
+        '我们已经把华雄的名字存在了一个变量（enemy）里，直接用变量名就好！',
+        '变量名直接写，不需要加引号。enemy 是一个变量，它的值是"华雄"。',
+        '填入 enemy（不加引号）。这样如果敌人换成别人，代码也不用改！这就是变量的好处。',
       ],
       qiReward: 40,
-      choices: ['enemy', '"华雄"', '"enemy"'],
+      choices: ['enemy', 'hero', '"enemy"'],
     },
   ],
   battle: {

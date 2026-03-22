@@ -1,37 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.ELEVENLAB_KEY || process.env.ELEVENLABS_KEY;
-// 诸葛亮 voice — use a warm, wise Chinese male voice
-// Default to "Daniel" if no custom voice ID set
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'onwK4e9ZLuTAKqWW03F9';
+const DOUBAO_APP_ID = process.env.DOUBAO_APP_ID;
+const DOUBAO_TOKEN = process.env.DOUBAO_ACCESS_TOKEN;
+const VOICE_TYPE = 'zh_female_yingyujiaoxue_uranus_bigtts';
 
 export async function POST(request: NextRequest) {
-  if (!ELEVENLABS_API_KEY) {
+  if (!DOUBAO_APP_ID || !DOUBAO_TOKEN) {
     return NextResponse.json({ error: 'TTS not configured' }, { status: 503 });
   }
 
   try {
     const { text } = await request.json();
 
-    if (!text || typeof text !== 'string' || text.length > 500) {
+    if (!text || typeof text !== 'string' || text.length > 1000) {
       return NextResponse.json({ error: 'Invalid text' }, { status: 400 });
     }
 
+    const reqid = randomUUID();
+
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      'https://openspeech.bytedance.com/api/v1/tts',
       {
         method: 'POST',
         headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
           'Content-Type': 'application/json',
+          'Authorization': `Bearer;${DOUBAO_TOKEN}`,
         },
         body: JSON.stringify({
-          text,
-          model_id: 'eleven_v3',
-          voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.75,
-            style: 0.3,
+          app: {
+            appid: DOUBAO_APP_ID,
+            token: 'access_token',
+            cluster: 'volcano_tts',
+          },
+          user: { uid: 'wolong-academy' },
+          audio: {
+            voice_type: VOICE_TYPE,
+            encoding: 'mp3',
+            speed_ratio: 1.0,
+          },
+          request: {
+            reqid,
+            text,
+            text_type: 'plain',
+            operation: 'query',
           },
         }),
       }
@@ -39,11 +51,19 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('ElevenLabs error:', err);
+      console.error('Doubao TTS error:', response.status, err);
       return NextResponse.json({ error: 'TTS generation failed' }, { status: 502 });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    const result = await response.json();
+
+    if (result.code !== 3000 || !result.data) {
+      console.error('Doubao TTS error response:', result);
+      return NextResponse.json({ error: result.message || 'TTS failed' }, { status: 502 });
+    }
+
+    // Decode base64 audio data
+    const audioBuffer = Buffer.from(result.data, 'base64');
 
     return new NextResponse(audioBuffer, {
       headers: {
