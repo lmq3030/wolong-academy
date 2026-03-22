@@ -11,6 +11,7 @@ import { SkillAnimation } from './SkillAnimation';
 import { VictoryScreen } from './VictoryScreen';
 import { ConceptLesson } from './ConceptLesson';
 import { CorrectFeedback } from './CorrectFeedback';
+import { PythonRepl } from './PythonRepl';
 import { concepts } from '@/lib/levels/concepts';
 import { TTSButton } from '@/components/ui/TTSButton';
 import type { BattlePhase } from '@/lib/engine/types';
@@ -51,6 +52,7 @@ export function BattleScene({
   const isEditorDisabled = phase !== 'challenge';
   const chapterConcept = concepts.find(c => c.unlockedByChapter === chapter.id);
   const [showExplain, setShowExplain] = React.useState(false);
+  const [showRepl, setShowRepl] = React.useState(false);
 
   // Auto-skip concept_intro if no concept for this chapter
   React.useEffect(() => {
@@ -134,6 +136,21 @@ export function BattleScene({
 
         {/* Bottom-right action buttons */}
         <div className="absolute bottom-3 right-3 z-20 flex gap-2">
+          {/* Python REPL button (试) */}
+          <button
+            onClick={() => setShowRepl(true)}
+            className="flex items-center justify-center rounded-full shadow-lg border-2 transition-transform active:scale-90 cursor-pointer"
+            style={{
+              width: 48,
+              height: 48,
+              backgroundColor: '#1e1e2e',
+              borderColor: '#4ec9b0',
+            }}
+            title="Python试验场 — 自由编写运行代码"
+          >
+            <span className="text-green-400 font-bold text-base font-mono">Py</span>
+          </button>
+
           {/* Ask advisor button (问军师) — always available */}
           {chapterConcept && (
             <button
@@ -285,6 +302,13 @@ export function BattleScene({
           />
         )}
       </AnimatePresence>
+
+      {/* Python REPL */}
+      <PythonRepl
+        isOpen={showRepl}
+        onClose={() => setShowRepl(false)}
+        initialCode={currentChallenge.codeTemplate || currentChallenge.correctAnswer}
+      />
     </div>
   );
 }

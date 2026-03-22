@@ -74,6 +74,22 @@ vi.mock('../VictoryScreen', () => ({
   ),
 }));
 
+vi.mock('../PythonRepl', () => ({
+  PythonRepl: () => null,
+}));
+
+vi.mock('../CorrectFeedback', () => ({
+  CorrectFeedback: () => null,
+}));
+
+vi.mock('@/lib/levels/concepts', () => ({
+  concepts: [],
+}));
+
+vi.mock('@/components/ui/TTSButton', () => ({
+  TTSButton: () => null,
+}));
+
 vi.mock('@/components/editor/CodeEditorSwitch', () => ({
   CodeEditorSwitch: ({ challenge, onSubmit, disabled, ...rest }: any) => (
     <div data-testid="code-editor" data-disabled={disabled} data-challenge-id={challenge.id}>
