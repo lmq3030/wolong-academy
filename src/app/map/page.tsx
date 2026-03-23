@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { chapters } from '@/lib/levels';
 import { ThreeKingdomsMap } from '@/components/map/ThreeKingdomsMap';
 
@@ -13,5 +14,9 @@ export default function MapPage() {
     return a.id.localeCompare(b.id);
   });
 
-  return <ThreeKingdomsMap chapters={chapterList} />;
+  return (
+    <Suspense>
+      <ThreeKingdomsMap chapters={chapterList} />
+    </Suspense>
+  );
 }
