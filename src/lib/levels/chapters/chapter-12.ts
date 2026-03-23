@@ -59,7 +59,7 @@ export const chapter12: Chapter = {
       id: 'ch12-c3',
       type: 'free_code',
       prompt:
-        '洪水持续冲刷！用while循环将队列中的敌将逐一从前端取出，直到全部被水淹没。',
+        '洪水持续冲刷！创建deque队列包含"于禁"、"庞德"、"曹仁"，用while循环和popleft()逐一取出，打印"XXX被水淹！"直到队列为空。',
       correctAnswer:
         'from collections import deque\ntroops = deque(["于禁", "庞德", "曹仁"])\nwhile len(troops) > 0:\n    soldier = troops.popleft()\n    print(soldier + "被水淹！")',
       testCases: [

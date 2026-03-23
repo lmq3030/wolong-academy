@@ -92,10 +92,10 @@ export function useLevelEngine(chapter: Chapter, initialChallengeIndex = 0) {
         case 'story_intro':
           return { ...prev, phase: 'challenge' as BattlePhase };
         case 'qi_charging': {
-          // User clicked "继续" on correct feedback — advance to next challenge or skill
+          // User clicked "继续" on correct feedback — advance to next challenge or skill animation
           const isLast = prev.currentChallengeIndex >= chapter.challenges.length - 1;
           if (prev.qiPercent >= 100 || isLast) {
-            return { ...prev, phase: 'skill_ready' as BattlePhase };
+            return { ...prev, phase: 'skill_animation' as BattlePhase };
           }
           return {
             ...prev,

@@ -95,7 +95,7 @@ export const chapter02: Chapter = {
         '填入"关羽"',
       ],
       qiReward: 40,
-      choices: ['关羽', '吕布', '诸葛亮'],
+      choices: ['关羽', '吕布', '"关羽"'],
     },
   ],
   battle: {

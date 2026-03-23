@@ -15,7 +15,7 @@ export const chapter11: Chapter = {
       id: 'ch11-c1',
       type: 'free_code',
       prompt:
-        '关羽步步深入敌营，每一步都压入栈中。创建一个栈，依次压入三层，然后查看栈顶元素。',
+        '关羽步步深入敌营。创建一个空列表作为栈，用append依次压入"第一层"、"第二层"、"第三层"，然后用print(stack[-1])打印栈顶元素。',
       correctAnswer:
         'stack = []\nstack.append("第一层")\nstack.append("第二层")\nstack.append("第三层")\nprint(stack[-1])',
       testCases: [
@@ -57,7 +57,7 @@ export const chapter11: Chapter = {
       id: 'ch11-c3',
       type: 'free_code',
       prompt:
-        '关羽原路返回，后进先出！用while循环将栈中所有元素依次弹出，展示LIFO（后进先出）的过程。',
+        '关羽原路返回！创建栈并依次压入"关羽进入"、"遇到伏兵"、"斩杀守卫"，然后用while循环和pop()将所有元素弹出并打印，观察后进先出的顺序。',
       correctAnswer:
         'stack = []\nstack.append("关羽进入")\nstack.append("遇到伏兵")\nstack.append("斩杀守卫")\nwhile len(stack) > 0:\n    print(stack.pop())',
       testCases: [

@@ -173,21 +173,14 @@ describe('useLevelEngine', () => {
 
       expect(result.current.state.phase).toBe('qi_charging');
 
-      // qi_charging -> skill_ready (after 1000ms)
+      // qi_charging -> skill_animation (skips skill_ready)
       act(() => {
-        result.current.nextPhase(); // qi_charging -> next
-      });
-
-      expect(result.current.state.phase).toBe('skill_ready');
-
-      // skill_ready -> skill_animation (after 500ms)
-      act(() => {
-        result.current.nextPhase(); // skill_ready -> skill_animation
+        result.current.nextPhase();
       });
 
       expect(result.current.state.phase).toBe('skill_animation');
 
-      // nextPhase from skill_animation -> victory
+      // skill_animation -> victory
       act(() => {
         result.current.nextPhase();
       });
@@ -213,9 +206,6 @@ describe('useLevelEngine', () => {
       });
       act(() => {
         result.current.nextPhase(); // qi_charging -> next
-      });
-      act(() => {
-        result.current.nextPhase(); // skill_ready -> skill_animation
       });
       act(() => {
         result.current.nextPhase(); // skill_animation -> victory
@@ -459,7 +449,7 @@ describe('useLevelEngine', () => {
   });
 
   describe('edge cases', () => {
-    it('goes to skill_ready on last challenge even when qi is below 100', () => {
+    it('goes to skill_animation on last challenge even when qi is below 100', () => {
       // Create a chapter where total qi rewards don't reach 100
       const lowQiChapter: Chapter = {
         ...testChapter,
@@ -513,11 +503,11 @@ describe('useLevelEngine', () => {
       expect(result.current.state.phase).toBe('challenge');
       expect(result.current.state.qiPercent).toBe(60);
 
-      // Challenge 3 (LAST): qi=90, below 100 but should still trigger skill_ready
+      // Challenge 3 (LAST): qi=90, below 100 but should still trigger skill_animation
       act(() => { result.current.submitCode('print("c")'); });
       expect(result.current.state.qiPercent).toBe(90);
       act(() => { result.current.nextPhase(); });
-      expect(result.current.state.phase).toBe('skill_ready');
+      expect(result.current.state.phase).toBe('skill_animation');
     });
 
     it('clamps qiPercent to 100 on oversized qi rewards', () => {
@@ -662,15 +652,9 @@ describe('useLevelEngine', () => {
       expect(result.current.state.phase).toBe('qi_charging');
       expect(result.current.state.qiPercent).toBe(100);
 
-      // qi_charging -> skill_ready (qi = 100)
+      // qi_charging -> skill_animation (skips skill_ready)
       act(() => {
-        result.current.nextPhase(); // qi_charging -> next
-      });
-      expect(result.current.state.phase).toBe('skill_ready');
-
-      // skill_ready -> skill_animation
-      act(() => {
-        result.current.nextPhase(); // skill_ready -> skill_animation
+        result.current.nextPhase();
       });
       expect(result.current.state.phase).toBe('skill_animation');
 

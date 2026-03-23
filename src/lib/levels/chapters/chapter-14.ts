@@ -31,7 +31,7 @@ export const chapter14: Chapter = {
         '填入 class——Python中定义类的关键字',
       ],
       qiReward: 30,
-      choices: ['class', 'def', 'struct'],
+      choices: ['class', 'def', 'Class'],
     },
     {
       id: 'ch14-c2',

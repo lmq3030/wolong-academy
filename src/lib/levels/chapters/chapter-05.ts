@@ -31,7 +31,7 @@ export const chapter05: Chapter = {
         '填入"5"——range(5)会产生0,1,2,3,4五个数字',
       ],
       qiReward: 30,
-      choices: ['5', '6', '3'],
+      choices: ['5', '6', '4'],
     },
     {
       id: 'ch05-c2',

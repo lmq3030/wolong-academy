@@ -128,12 +128,12 @@ export const chapter00: Chapter = {
         },
         {
           id: 'ch00-c3-opt4',
-          code: 'print("四弟：赵云")',
+          code: 'print(大哥：刘备)',
           isCorrect: false,
         },
         {
           id: 'ch00-c3-opt5',
-          code: 'print("军师：诸葛亮")',
+          code: 'print(二弟：关羽)',
           isCorrect: false,
         },
       ],
