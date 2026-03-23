@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { Chapter } from '@/lib/levels';
 
@@ -17,12 +17,14 @@ interface CityNodeProps {
 
 export function CityNode({ chapter, status, stars = 0, x, y }: CityNodeProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDebug = searchParams.get('debug') === '1';
 
   const size = status === 'current' ? 40 : 30;
 
   function handleClick() {
     if (status === 'locked') return;
-    router.push(`/battle/${chapter.id}`);
+    router.push(`/battle/${chapter.id}${isDebug ? '?debug=1' : ''}`);
   }
 
   const fillColor =

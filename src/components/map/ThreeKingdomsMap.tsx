@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { Chapter } from '@/lib/levels';
 import { getProgress, isChapterUnlocked, type LocalProgress } from '@/lib/progress';
@@ -96,6 +97,8 @@ interface ThreeKingdomsMapProps {
 }
 
 export function ThreeKingdomsMap({ chapters }: ThreeKingdomsMapProps) {
+  const searchParams = useSearchParams();
+  const isDebug = searchParams.get('debug') === '1';
   const [progress, setProgress] = useState<LocalProgress | null>(null);
 
   useEffect(() => {
@@ -115,10 +118,10 @@ export function ThreeKingdomsMap({ chapters }: ThreeKingdomsMapProps) {
   const positions = computeNodePositions(chapters);
   const actLabels = computeActLabelPositions(chapters);
 
-  // Determine status for each chapter
+  // Determine status for each chapter (debug mode unlocks all)
   const statuses: CityStatus[] = chapters.map((ch) => {
     if (ch.id in progress.completedChapters) return 'completed';
-    if (isChapterUnlocked(ch.id, sortedIds, progress.completedChapters)) return 'current';
+    if (isDebug || isChapterUnlocked(ch.id, sortedIds, progress.completedChapters)) return 'current';
     return 'locked';
   });
 
