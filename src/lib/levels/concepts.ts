@@ -135,6 +135,21 @@ print("共借到", len(arrows), "批箭")`,
     act: 2,
   },
   {
+    id: 'concept-strings',
+    name: '字符串操作',
+    threeKingdomsName: '密信传书',
+    description: '字符串就像密信，可以拼接、截取、测量长度。',
+    example: `message = "火" + "攻" + "曹营"
+print(message)
+print("密信长度：" + str(len(message)))
+print("第一个字：" + message[0])`,
+    expectedOutput: `火攻曹营
+密信长度：4
+第一个字：火`,
+    unlockedByChapter: 'chapter-09',
+    act: 2,
+  },
+  {
     id: 'concept-search',
     name: '搜索算法',
     threeKingdomsName: '赵云长坂坡',

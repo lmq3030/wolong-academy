@@ -40,8 +40,8 @@ function computeNodePositions(chapters: Chapter[]): { x: number; y: number }[] {
     acts[ch.act].push(ch);
   }
 
-  // Y bands for each act row
-  const actBaseY: Record<number, number> = { 1: 140, 2: 310, 3: 480, 4: 650 };
+  // Y bands for each act row — spaced 220px apart to avoid overlap with labels
+  const actBaseY: Record<number, number> = { 1: 140, 2: 360, 3: 580, 4: 800 };
 
   for (const ch of chapters) {
     const actChapters = acts[ch.act];
@@ -78,7 +78,7 @@ function computeNodePositions(chapters: Chapter[]): { x: number; y: number }[] {
 function computeActLabelPositions(chapters: Chapter[]): { act: number; y: number }[] {
   const seen = new Set<number>();
   const results: { act: number; y: number }[] = [];
-  const actBaseY: Record<number, number> = { 1: 140, 2: 310, 3: 480, 4: 650 };
+  const actBaseY: Record<number, number> = { 1: 140, 2: 360, 3: 580, 4: 800 };
 
   for (const ch of chapters) {
     if (!seen.has(ch.act)) {

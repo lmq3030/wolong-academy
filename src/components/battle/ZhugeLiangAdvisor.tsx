@@ -23,7 +23,7 @@ export function ZhugeLiangAdvisor() {
   const playbackCtxRef = useRef<AudioContext | null>(null);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
 
-  const cleanup = useCallback(() => {
+  const cleanupResources = useCallback(() => {
     // Stop mic
     if (workletNodeRef.current) {
       workletNodeRef.current.disconnect();
@@ -50,8 +50,13 @@ export function ZhugeLiangAdvisor() {
       wsRef.current = null;
     }
     nextPlayTimeRef.current = 0;
-    setState('idle');
+    activeSourcesRef.current = [];
   }, []);
+
+  const cleanup = useCallback(() => {
+    cleanupResources();
+    setState('idle');
+  }, [cleanupResources]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -125,9 +130,13 @@ export function ZhugeLiangAdvisor() {
         } catch {}
       };
 
-      ws.onerror = () => setState('error');
+      ws.onerror = () => {
+        console.error('Voice advisor: WebSocket connection failed. Is the WS proxy running? (npm run dev:ws)');
+        setState('error');
+      };
       ws.onclose = () => {
-        if (isOpen) setState('idle');
+        // Don't overwrite error state — let the retry button remain visible
+        setState((prev) => (prev === 'error' ? 'error' : 'idle'));
       };
 
       // 5. Send mic audio chunks to WS
@@ -139,13 +148,14 @@ export function ZhugeLiangAdvisor() {
         }
       };
 
-      setState('listening');
+      // State transitions to 'listening' when proxy sends the state event
+      // after Doubao handshake completes (StartConnection → StartSession → SayHello)
     } catch (err) {
       console.error('Failed to start voice session:', err);
+      cleanupResources();
       setState('error');
-      cleanup();
     }
-  }, [cleanup, isOpen]);
+  }, [cleanupResources]);
 
   const playPCMAudio = useCallback(
     (base64Data: string, ctx: AudioContext) => {
@@ -336,9 +346,22 @@ export function ZhugeLiangAdvisor() {
                   {state === 'connecting' && '正在连接...'}
                   {state === 'listening' && '正在听你说话...'}
                   {state === 'speaking' && '军师正在回答...'}
-                  {state === 'error' && '连接出错，请重试'}
+                  {state === 'error' && '连接出错'}
                   {state === 'idle' && '点击开始对话'}
                 </p>
+                {state === 'error' && (
+                  <button
+                    onClick={() => { cleanupResources(); startSession(); }}
+                    className="mt-1 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer transition-transform active:scale-95"
+                    style={{
+                      backgroundColor: 'var(--color-shu-red)',
+                      color: 'white',
+                      fontFamily: 'serif',
+                    }}
+                  >
+                    重新连接
+                  </button>
+                )}
               </div>
 
               {/* Mic indicator */}

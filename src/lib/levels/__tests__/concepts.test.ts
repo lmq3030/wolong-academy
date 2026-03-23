@@ -3,8 +3,8 @@ import { concepts } from '../concepts';
 import { chapters } from '../chapters';
 
 describe('Python Concepts Data', () => {
-  it('has exactly 15 concepts', () => {
-    expect(concepts).toHaveLength(15);
+  it('has exactly 16 concepts', () => {
+    expect(concepts).toHaveLength(16);
   });
 
   it('each concept has all required fields', () => {
@@ -104,6 +104,7 @@ describe('Python Concepts Data', () => {
       'concept-while-loop': '七擒孟获',
       'concept-debug': '刮骨疗毒',
       'concept-list-ops': '草船借箭',
+      'concept-strings': '密信传书',
       'concept-search': '赵云长坂坡',
       'concept-stack': '单刀赴会',
       'concept-queue': '水淹七军',
