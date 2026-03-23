@@ -7,11 +7,19 @@ type AdvisorState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'error';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_PROXY_URL || 'wss://wolong-ws-proxy.fly.dev';
 
+interface ChallengeContext {
+  chapterTitle: string;
+  concept: string;
+  prompt: string;
+  codeTemplate?: string;
+  hints: string[];
+}
+
 /**
  * Floating Zhuge Liang voice advisor — like Clippy but for Three Kingdoms Python learning.
  * Click avatar to open voice chat panel. Uses Doubao realtime dialog via WS proxy.
  */
-export function ZhugeLiangAdvisor() {
+export function ZhugeLiangAdvisor({ challengeContext }: { challengeContext?: ChallengeContext }) {
   const [isOpen, setIsOpen] = useState(false);
   const [state, setState] = useState<AdvisorState>('idle');
   const wsRef = useRef<WebSocket | null>(null);
@@ -102,7 +110,10 @@ export function ZhugeLiangAdvisor() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        ws.send(JSON.stringify({ type: 'start' }));
+        ws.send(JSON.stringify({
+          type: 'start',
+          challengeContext: challengeContext || undefined,
+        }));
       };
 
       ws.onmessage = (event) => {

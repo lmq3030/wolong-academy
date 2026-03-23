@@ -17,20 +17,28 @@ const RESOURCE_ID = 'volc.speech.dialog';
 const APP_KEY = 'PlgvMymc7f3tQnJ6';
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean);
 
-const SESSION_CONFIG = {
-  asr: { extra: { end_smooth_window_ms: 1500 } },
-  tts: {
-    speaker: 'zh_male_xiaotian_jupiter_bigtts',
-    audio_config: { channel: 1, format: 'pcm', sample_rate: 24000 },
-  },
-  dialog: {
-    bot_name: '诸葛亮',
-    system_role: '你是诸葛亮，卧龙学堂的军师。你正在教一个8-9岁的小朋友学习Python编程。你用三国故事来解释编程概念，语气温和有耐心，像一个智慧的老师。',
-    speaking_style: '说话像古代军师，偶尔用三国典故，但用词简单，让小朋友能听懂。',
-    location: { city: '成都' },
-    extra: { strict_audit: false, recv_timeout: 30, input_mod: 'audio' },
-  },
-};
+const BASE_SYSTEM_ROLE = '你是诸葛亮，卧龙学堂的军师。你正在教一个8-9岁的小朋友学习Python编程。你用三国故事来解释编程概念，语气温和有耐心，像一个智慧的老师。';
+
+function buildSessionConfig(ctx) {
+  let systemRole = BASE_SYSTEM_ROLE;
+  if (ctx) {
+    systemRole += `\n\n【当前关卡】${ctx.chapterTitle || ''}`;
+    systemRole += `\n【Python概念】${ctx.concept || ''}`;
+    systemRole += `\n【题目】${ctx.prompt || ''}`;
+    if (ctx.codeTemplate) systemRole += `\n【代码模板】${ctx.codeTemplate.replace(/___/g, '（空白处）')}`;
+    if (ctx.hints?.length) systemRole += `\n【提示】${ctx.hints[0]}`;
+    systemRole += '\n\n请根据以上题目帮助小朋友理解和解答，但不要直接告诉答案，要引导他们思考。';
+  }
+  return {
+    asr: { extra: { end_smooth_window_ms: 1500 } },
+    tts: { speaker: 'zh_male_xiaotian_jupiter_bigtts', audio_config: { channel: 1, format: 'pcm', sample_rate: 24000 } },
+    dialog: {
+      bot_name: '诸葛亮', system_role: systemRole,
+      speaking_style: '说话像古代军师，偶尔用三国典故，但用词简单，让小朋友能听懂。',
+      location: { city: '成都' }, extra: { strict_audit: false, recv_timeout: 30, input_mod: 'audio' },
+    },
+  };
+}
 
 // ── Binary Protocol ────────────────────────────────────────────────────
 
@@ -131,11 +139,12 @@ function parseResponse(res) {
 // ── Dialog Session ─────────────────────────────────────────────────────
 
 class DoubaoDialogSession {
-  constructor(browserWs) {
+  constructor(browserWs, challengeCtx) {
     this.ws = null;
     this.browserWs = browserWs;
     this.sessionId = randomUUID();
     this.isActive = false;
+    this.challengeCtx = challengeCtx;
   }
 
   async connect() {
@@ -177,7 +186,7 @@ class DoubaoDialogSession {
   }
 
   async _startSession() {
-    this.ws.send(buildRequest(100, this.sessionId, SESSION_CONFIG));
+    this.ws.send(buildRequest(100, this.sessionId, buildSessionConfig(this.challengeCtx)));
     await this._waitForResponse();
     console.log('[doubao] StartSession OK');
   }
@@ -271,7 +280,7 @@ wss.on('connection', (browserWs) => {
       const msg = JSON.parse(raw.toString());
       if (msg.type === 'start') {
         if (session) await session.close();
-        session = new DoubaoDialogSession(browserWs);
+        session = new DoubaoDialogSession(browserWs, msg.challengeContext);
         await session.connect();
         console.log('[proxy] session started');
       } else if (msg.type === 'audio' && session) {

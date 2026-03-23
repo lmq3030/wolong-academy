@@ -148,7 +148,15 @@ export function BattleScene({
         {/* Bottom-right action buttons */}
         <div className="absolute bottom-3 right-3 z-20 flex gap-2">
           {/* Zhuge Liang voice advisor */}
-          <ZhugeLiangAdvisor />
+          <ZhugeLiangAdvisor
+            challengeContext={{
+              chapterTitle: chapter.title,
+              concept: chapter.pythonConcept,
+              prompt: currentChallenge.prompt,
+              codeTemplate: currentChallenge.codeTemplate,
+              hints: currentChallenge.hints,
+            }}
+          />
 
           {/* Python REPL button (试) */}
           <button

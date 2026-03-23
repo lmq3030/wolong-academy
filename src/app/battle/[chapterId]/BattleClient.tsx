@@ -18,8 +18,13 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
   const engine = useLevelEngine(chapter, initialChallenge);
   const [accessChecked, setAccessChecked] = useState(false);
 
-  // Check if chapter is unlocked — redirect to map if not
+  // Check if chapter is unlocked — redirect to map if not (debug mode bypasses)
+  const isDebug = searchParams.get('debug') === '1';
   useEffect(() => {
+    if (isDebug) {
+      setAccessChecked(true);
+      return;
+    }
     const sortedIds = Object.values(allChapters)
       .sort((a, b) => a.act !== b.act ? a.act - b.act : a.id.localeCompare(b.id))
       .map(c => c.id);
