@@ -16,25 +16,25 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
     chapter.challenges.length - 1
   );
   const engine = useLevelEngine(chapter, initialChallenge);
-  const [accessChecked, setAccessChecked] = useState(false);
+  const [accessState, setAccessState] = useState<'loading' | 'granted' | 'locked'>('loading');
 
-  // Check if chapter is unlocked — redirect to map if not (debug mode bypasses)
+  // Check if chapter is unlocked (debug mode bypasses)
   const isDebug = searchParams.get('debug') === '1';
   useEffect(() => {
     if (isDebug) {
-      setAccessChecked(true);
+      setAccessState('granted');
       return;
     }
     const sortedIds = Object.values(allChapters)
       .sort((a, b) => a.act !== b.act ? a.act - b.act : a.id.localeCompare(b.id))
       .map(c => c.id);
     const progress = getProgress();
-    if (!isChapterUnlocked(chapter.id, sortedIds, progress.completedChapters)) {
-      router.replace('/map');
+    if (isChapterUnlocked(chapter.id, sortedIds, progress.completedChapters)) {
+      setAccessState('granted');
     } else {
-      setAccessChecked(true);
+      setAccessState('locked');
     }
-  }, [chapter.id, router]);
+  }, [chapter.id, isDebug]);
 
   // Sync challenge index to URL query param for refresh persistence
   useEffect(() => {
@@ -43,7 +43,22 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
     window.history.replaceState(null, '', url);
   }, [engine.state.currentChallengeIndex, chapter.id]);
 
-  if (!accessChecked) {
+  if (accessState === 'locked') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: 'var(--color-parchment)' }}>
+        <p className="text-lg" style={{ color: 'var(--color-ink)', fontFamily: 'serif' }}>此关卡尚未解锁，请先完成前面的关卡。</p>
+        <button
+          onClick={() => router.push('/map')}
+          className="px-6 py-2 rounded-lg font-bold cursor-pointer"
+          style={{ backgroundColor: 'var(--color-shu-red)', color: 'white', fontFamily: 'serif' }}
+        >
+          返回地图
+        </button>
+      </div>
+    );
+  }
+
+  if (accessState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-parchment)' }}>
         <p style={{ color: 'var(--color-ink)', fontFamily: 'serif' }}>军师正在布阵...</p>
