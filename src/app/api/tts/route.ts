@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 
 const DOUBAO_APP_ID = process.env.DOUBAO_APP_ID;
 const DOUBAO_TOKEN = process.env.DOUBAO_ACCESS_TOKEN;
-const VOICE_TYPE = 'zh_female_yingyujiaoxue_uranus_bigtts';
+const SPEAKER = 'zh_male_sunwukong_uranus_bigtts';
 
 export async function POST(request: NextRequest) {
   if (!DOUBAO_APP_ID || !DOUBAO_TOKEN) {
@@ -17,33 +17,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid text' }, { status: 400 });
     }
 
-    const reqid = randomUUID();
-
     const response = await fetch(
-      'https://openspeech.bytedance.com/api/v1/tts',
+      'https://openspeech.bytedance.com/api/v3/tts/unidirectional',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer;${DOUBAO_TOKEN}`,
+          'X-Api-App-Id': DOUBAO_APP_ID,
+          'X-Api-Access-Key': DOUBAO_TOKEN,
+          'X-Api-Resource-Id': 'seed-tts-2.0',
+          'X-Api-Request-Id': randomUUID(),
         },
         body: JSON.stringify({
-          app: {
-            appid: DOUBAO_APP_ID,
-            token: 'access_token',
-            cluster: 'volcano_tts',
-          },
           user: { uid: 'wolong-academy' },
-          audio: {
-            voice_type: VOICE_TYPE,
-            encoding: 'mp3',
-            speed_ratio: 1.0,
-          },
-          request: {
-            reqid,
+          req_params: {
             text,
-            text_type: 'plain',
-            operation: 'query',
+            speaker: SPEAKER,
+            audio_params: {
+              format: 'mp3',
+              sample_rate: 24000,
+            },
           },
         }),
       }
@@ -55,15 +48,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'TTS generation failed' }, { status: 502 });
     }
 
-    const result = await response.json();
+    // V3 returns newline-delimited JSON: { code: 0, data: "<base64>" } per chunk,
+    // { code: 20000000 } as the final signal.
+    // Collect all chunks first to detect application-level errors inside HTTP 200.
+    // Doubao may return application-level errors inside an HTTP 200 NDJSON stream.
+    const body = await response.text();
+    const audioChunks: Buffer[] = [];
 
-    if (result.code !== 3000 || !result.data) {
-      console.error('Doubao TTS error response:', result);
-      return NextResponse.json({ error: result.message || 'TTS failed' }, { status: 502 });
+    for (const line of body.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const chunk = JSON.parse(trimmed);
+        if (chunk.code === 0 && chunk.data) {
+          audioChunks.push(Buffer.from(chunk.data, 'base64'));
+        } else if (chunk.code !== 0 && chunk.code !== 20000000) {
+          console.error('Doubao TTS chunk error:', chunk);
+          return NextResponse.json(
+            { error: chunk.message || 'TTS failed' },
+            { status: 502 }
+          );
+        }
+      } catch {
+        // Skip non-JSON lines
+      }
     }
 
-    // Decode base64 audio data
-    const audioBuffer = Buffer.from(result.data, 'base64');
+    if (audioChunks.length === 0) {
+      console.error('Doubao TTS: no audio data received');
+      return NextResponse.json({ error: 'No audio data' }, { status: 502 });
+    }
+
+    const audioBuffer = Buffer.concat(audioChunks);
 
     return new NextResponse(audioBuffer, {
       headers: {

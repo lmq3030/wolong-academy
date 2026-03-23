@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 
 interface TTSButtonProps {
   text: string;
@@ -15,6 +15,16 @@ interface TTSButtonProps {
 export function TTSButton({ text, label = '听讲解', size = 'md' }: TTSButtonProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<'idle' | 'loading' | 'playing'>('idle');
+
+  // Stop audio when component unmounts (e.g., popup closed)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const handleClick = useCallback(async () => {
     if (state === 'playing' && audioRef.current) {

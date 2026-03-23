@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 interface ErrorFeedbackProps {
@@ -14,6 +14,16 @@ interface ErrorFeedbackProps {
 export function ErrorFeedback({ message, lineNumber, code, output, onDismiss }: ErrorFeedbackProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [ttsState, setTtsState] = useState<'idle' | 'loading' | 'playing'>('idle');
+
+  // Stop audio when component unmounts (e.g., popup dismissed)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const playVoice = useCallback(async () => {
     // If already playing, stop it

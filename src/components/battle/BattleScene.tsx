@@ -12,6 +12,7 @@ import { VictoryScreen } from './VictoryScreen';
 import { ConceptLesson } from './ConceptLesson';
 import { CorrectFeedback } from './CorrectFeedback';
 import { PythonRepl } from './PythonRepl';
+import { ZhugeLiangAdvisor } from './ZhugeLiangAdvisor';
 import { concepts } from '@/lib/levels/concepts';
 import { TTSButton } from '@/components/ui/TTSButton';
 import Link from 'next/link';
@@ -146,6 +147,9 @@ export function BattleScene({
 
         {/* Bottom-right action buttons */}
         <div className="absolute bottom-3 right-3 z-20 flex gap-2">
+          {/* Zhuge Liang voice advisor */}
+          <ZhugeLiangAdvisor />
+
           {/* Python REPL button (试) */}
           <button
             onClick={() => setShowRepl(true)}
