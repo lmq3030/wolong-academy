@@ -147,17 +147,6 @@ export function BattleScene({
 
         {/* Bottom-right action buttons */}
         <div className="absolute bottom-3 right-3 z-20 flex gap-2">
-          {/* Zhuge Liang voice advisor */}
-          <ZhugeLiangAdvisor
-            challengeContext={{
-              chapterTitle: chapter.title,
-              concept: chapter.pythonConcept,
-              prompt: currentChallenge.prompt,
-              codeTemplate: currentChallenge.codeTemplate,
-              hints: currentChallenge.hints,
-            }}
-          />
-
           {/* Python REPL button (试) */}
           <button
             onClick={() => setShowRepl(true)}
@@ -334,6 +323,23 @@ export function BattleScene({
           initialCode={currentChallenge.codeTemplate || currentChallenge.correctAnswer}
         />
       )}
+
+      {/* Zhuge Liang voice advisor — fixed position, always accessible (even during overlays) */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <ZhugeLiangAdvisor
+          challengeContext={{
+            chapterTitle: chapter.title,
+            concept: chapter.pythonConcept,
+            prompt: phase === 'concept_intro' && chapterConcept
+              ? `【概念学习】${chapterConcept.name}：${chapterConcept.description}`
+              : phase === 'story_intro'
+                ? `【故事介绍】${chapter.storyIntro}`
+                : currentChallenge.prompt,
+            codeTemplate: currentChallenge.codeTemplate,
+            hints: currentChallenge.hints,
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 
 const DOUBAO_APP_ID = process.env.DOUBAO_APP_ID;
 const DOUBAO_TOKEN = process.env.DOUBAO_ACCESS_TOKEN;
-const SPEAKER = 'zh_male_sunwukong_uranus_bigtts';
+const SPEAKER = 'zh_male_m191_uranus_bigtts';
 
 export async function POST(request: NextRequest) {
   if (!DOUBAO_APP_ID || !DOUBAO_TOKEN) {
