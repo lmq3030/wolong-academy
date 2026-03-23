@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { chapters } from '@/lib/levels';
 import { notFound } from 'next/navigation';
 import { BattleClient } from './BattleClient';
@@ -14,5 +15,9 @@ export default async function BattlePage({
     notFound();
   }
 
-  return <BattleClient chapter={chapter} />;
+  return (
+    <Suspense>
+      <BattleClient chapter={chapter} />
+    </Suspense>
+  );
 }
