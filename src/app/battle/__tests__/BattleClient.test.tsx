@@ -9,6 +9,7 @@ const pushMock = vi.fn();
 const replaceMock = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock, replace: replaceMock }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const nextPhaseMock = vi.fn();

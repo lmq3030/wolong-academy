@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLevelEngine } from '@/lib/engine/useLevelEngine';
 import { BattleScene } from '@/components/battle/BattleScene';
 import { saveChapterProgress, addXP, unlockGenerals, isChapterUnlocked, getProgress } from '@/lib/progress';
@@ -10,7 +10,12 @@ import type { Chapter } from '@/lib/levels/types';
 
 export function BattleClient({ chapter }: { chapter: Chapter }) {
   const router = useRouter();
-  const engine = useLevelEngine(chapter);
+  const searchParams = useSearchParams();
+  const initialChallenge = Math.min(
+    parseInt(searchParams.get('c') || '0', 10) || 0,
+    chapter.challenges.length - 1
+  );
+  const engine = useLevelEngine(chapter, initialChallenge);
   const [accessChecked, setAccessChecked] = useState(false);
 
   // Check if chapter is unlocked — redirect to map if not
@@ -25,6 +30,13 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
       setAccessChecked(true);
     }
   }, [chapter.id, router]);
+
+  // Sync challenge index to URL query param for refresh persistence
+  useEffect(() => {
+    const idx = engine.state.currentChallengeIndex;
+    const url = idx > 0 ? `/battle/${chapter.id}?c=${idx}` : `/battle/${chapter.id}`;
+    window.history.replaceState(null, '', url);
+  }, [engine.state.currentChallengeIndex, chapter.id]);
 
   if (!accessChecked) {
     return (

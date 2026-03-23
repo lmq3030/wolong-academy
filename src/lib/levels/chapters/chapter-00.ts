@@ -133,12 +133,7 @@ export const chapter00: Chapter = {
         },
         {
           id: 'ch00-c3-opt5',
-          code: 'print("三弟：张飞")',
-          isCorrect: false,
-        },
-        {
-          id: 'ch00-c3-opt6',
-          code: 'print("大哥：刘备")',
+          code: 'print("军师：诸葛亮")',
           isCorrect: false,
         },
       ],

@@ -244,6 +244,22 @@ export function DragDropEditor({
         ))}
       </div>
 
+      {/* Submit button — appears when all slots are correctly filled */}
+      {slots.length > 0 && slots.every((s) => s.correct) && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto px-8 py-3 rounded-xl text-white font-bold text-lg cursor-pointer transition-transform active:scale-95"
+          style={{ backgroundColor: 'var(--color-wu-green)', fontFamily: 'serif' }}
+          onClick={() => {
+            const code = slots.map((s) => s.option!.code).join('\n');
+            onSubmit(code);
+          }}
+        >
+          提交答案
+        </motion.button>
+      )}
+
       {/* Draggable code blocks */}
       <div
         className="flex flex-wrap gap-3 justify-center pt-2"

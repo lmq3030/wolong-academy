@@ -6,14 +6,18 @@ import { validateStatic, validateDynamic } from './codeValidator';
 import type { Chapter } from '@/lib/levels/types';
 import type { BattlePhase, LevelState } from './types';
 
-export function useLevelEngine(chapter: Chapter) {
+export function useLevelEngine(chapter: Chapter, initialChallengeIndex = 0) {
   const { runCode, isReady: pyodideReady } = usePyodide();
 
   const [state, setState] = useState<LevelState>({
-    phase: 'concept_intro',
-    currentChallengeIndex: 0,
-    qiPercent: 0,
-    stars: 3, // Start at 3, deduct for errors/hints
+    // Skip intros if resuming mid-chapter
+    phase: initialChallengeIndex > 0 ? 'challenge' : 'concept_intro',
+    currentChallengeIndex: initialChallengeIndex,
+    // Pre-fill qi for completed challenges when resuming
+    qiPercent: chapter.challenges
+      .slice(0, initialChallengeIndex)
+      .reduce((sum, c) => sum + c.qiReward, 0),
+    stars: 3,
     errorsUsed: 0,
     hintsUsed: 0,
   });
