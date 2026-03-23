@@ -44,3 +44,6 @@ next-env.d.ts
 # test/temp artifacts
 /tmp/
 .playwright-mcp/
+
+# reference demos (not project code)
+/demo_live_audio/
