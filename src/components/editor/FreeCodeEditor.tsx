@@ -2,6 +2,11 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { EditorView, keymap, placeholder as cmPlaceholder, lineNumbers } from '@codemirror/view';
+import { EditorState, Compartment } from '@codemirror/state';
+import { python } from '@codemirror/lang-python';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { indentWithTab } from '@codemirror/commands';
 import type { EditorProps } from './types';
 
 export function FreeCodeEditor({
@@ -10,71 +15,87 @@ export function FreeCodeEditor({
   disabled = false,
 }: EditorProps) {
   const [code, setCode] = useState(challenge.codeTemplate ?? '');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
+  const codeRef = useRef(code);
+  codeRef.current = code;
+  const readOnlyComp = useRef(new Compartment());
 
-  // Auto-resize textarea to fit content
+  // Initialize CodeMirror
   useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.max(el.scrollHeight, 200)}px`;
-  }, [code]);
+    if (!editorRef.current) return;
 
-  const lineCount = code.split('\n').length;
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (disabled) return;
-
-      const el = e.currentTarget;
-
-      // Tab inserts 4 spaces
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-        const before = code.slice(0, start);
-        const after = code.slice(end);
-        const newCode = before + '    ' + after;
+    const updateListener = EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        const newCode = update.state.doc.toString();
+        codeRef.current = newCode;
         setCode(newCode);
-        // Restore cursor position after state update
-        requestAnimationFrame(() => {
-          el.selectionStart = start + 4;
-          el.selectionEnd = start + 4;
-        });
       }
+    });
 
-      // Enter preserves indentation
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const start = el.selectionStart;
-        const before = code.slice(0, start);
-        const after = code.slice(el.selectionEnd);
+    const state = EditorState.create({
+      doc: challenge.codeTemplate ?? '',
+      extensions: [
+        lineNumbers(),
+        python(),
+        oneDark,
+        keymap.of([indentWithTab]),
+        updateListener,
+        cmPlaceholder('在这里编写你的 Python 代码 ...'),
+        EditorView.theme({
+          '&': {
+            fontSize: '15px',
+            minHeight: '180px',
+            borderRadius: '12px',
+            overflow: 'hidden',
+          },
+          '.cm-content': {
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+            padding: '12px 0',
+            minHeight: '180px',
+          },
+          '.cm-gutters': {
+            borderRight: '1px solid #3e4451',
+            minWidth: '36px',
+          },
+          '.cm-scroller': {
+            overflow: 'auto',
+          },
+          '&.cm-focused': {
+            outline: '2px solid var(--color-gold)',
+            outlineOffset: '-2px',
+          },
+        }),
+        readOnlyComp.current.of(EditorState.readOnly.of(disabled)),
+      ],
+    });
 
-        // Find the current line's leading whitespace
-        const currentLine = before.split('\n').pop() ?? '';
-        const indent = currentLine.match(/^(\s*)/)?.[1] ?? '';
+    const view = new EditorView({
+      state,
+      parent: editorRef.current,
+    });
+    viewRef.current = view;
 
-        // If the line ends with ':', add extra indent
-        const trimmedLine = currentLine.trimEnd();
-        const extraIndent = trimmedLine.endsWith(':') ? '    ' : '';
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  // Only recreate on challenge change, not on every disabled toggle
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challenge.id]);
 
-        const newCode = before + '\n' + indent + extraIndent + after;
-        const cursorPos = start + 1 + indent.length + extraIndent.length;
-        setCode(newCode);
-        requestAnimationFrame(() => {
-          el.selectionStart = cursorPos;
-          el.selectionEnd = cursorPos;
-        });
-      }
-    },
-    [code, disabled]
-  );
+  // Update readOnly when disabled changes
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: readOnlyComp.current.reconfigure(EditorState.readOnly.of(disabled)),
+    });
+  }, [disabled]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (disabled) return;
-    onSubmit(code);
-  };
+    onSubmit(codeRef.current);
+  }, [disabled, onSubmit]);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
@@ -86,52 +107,14 @@ export function FreeCodeEditor({
         </p>
       </div>
 
-      {/* Code editor area */}
+      {/* CodeMirror editor */}
       <div
-        className="relative bg-[var(--color-parchment)] rounded-xl border-2 border-[var(--color-bamboo)] overflow-hidden"
+        ref={editorRef}
         data-testid="code-editor"
-      >
-        <div className="flex">
-          {/* Line numbers */}
-          <div
-            className="
-              flex flex-col items-end px-3 py-4
-              bg-[var(--color-bamboo)] bg-opacity-10
-              text-[var(--color-bamboo)] text-sm font-mono
-              select-none min-w-[40px] border-r border-[var(--color-bamboo)] border-opacity-30
-            "
-            aria-hidden="true"
-          >
-            {Array.from({ length: lineCount }, (_, i) => (
-              <div key={i} className="leading-[1.6rem]">
-                {i + 1}
-              </div>
-            ))}
-          </div>
+        className="rounded-xl overflow-hidden shadow-md"
+      />
 
-          {/* Textarea */}
-          <textarea
-            ref={textareaRef}
-            data-testid="code-textarea"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={disabled}
-            spellCheck={false}
-            className="
-              flex-1 p-4 font-mono text-lg leading-[1.6rem]
-              bg-transparent text-[var(--color-ink)]
-              resize-none outline-none
-              min-h-[200px]
-              disabled:opacity-50
-              placeholder:text-[var(--color-bamboo)] placeholder:opacity-50
-            "
-            placeholder="在这里编写你的 Python 代码..."
-          />
-        </div>
-      </div>
-
-      {/* Submit button - battle horn style */}
+      {/* Submit button */}
       <div className="flex justify-center">
         <motion.button
           whileHover={!disabled ? { scale: 1.05 } : {}}
