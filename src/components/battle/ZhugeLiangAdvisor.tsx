@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 type AdvisorState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'error';
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_PROXY_URL || 'ws://localhost:3001';
+const WS_URL = process.env.NEXT_PUBLIC_WS_PROXY_URL || 'wss://wolong-ws-proxy.fly.dev';
 
 /**
  * Floating Zhuge Liang voice advisor — like Clippy but for Three Kingdoms Python learning.
