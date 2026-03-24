@@ -36,6 +36,7 @@ vi.mock('@/lib/progress', () => ({
   saveChapterProgress: vi.fn(),
   addXP: vi.fn(),
   unlockGenerals: vi.fn(),
+  syncProgressToServer: vi.fn(),
   isChapterUnlocked: vi.fn(() => true),
   getProgress: vi.fn(() => ({ completedChapters: {}, unlockedGenerals: [], xp: 0, level: 1 })),
 }));
@@ -163,23 +164,14 @@ describe('BattleClient', () => {
     expect(nextPhaseMock).not.toHaveBeenCalled();
   });
 
-  it('calls fetch /api/progress on victory phase', () => {
+  it('calls syncProgressToServer on victory phase', async () => {
+    const { syncProgressToServer } = await import('@/lib/progress');
     setupEngine('victory');
     render(<BattleClient chapter={mockChapter} />);
 
     fireEvent.click(screen.getByTestId('battle-scene'));
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chapterId: 'chapter-00',
-        stars: 3,
-        xpGained: 150,
-        unlockedGenerals: ['guan-yu', 'zhang-fei'],
-        unlockedItems: ['sword'],
-      }),
-    });
+    expect(syncProgressToServer).toHaveBeenCalled();
   });
 
   it('navigates to /map after saving on victory phase', () => {

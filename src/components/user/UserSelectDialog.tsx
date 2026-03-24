@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   getUsers,
-  createUser,
+  loginUser,
   switchUser,
   deleteUser,
   type UserProfile,
@@ -166,8 +166,17 @@ export function UserSelectDialog({ open, onUserSelected }: UserSelectDialogProps
     }
   }, [open, refreshUsers]);
 
-  const handleSelect = (userId: string) => {
-    switchUser(userId);
+  const handleSelect = async (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      // Sync from server to get latest progress
+      await loginUser(user.username).catch(() => {
+        // Fallback to local-only
+        switchUser(userId);
+      });
+    } else {
+      switchUser(userId);
+    }
     onUserSelected();
   };
 
@@ -176,7 +185,9 @@ export function UserSelectDialog({ open, onUserSelected }: UserSelectDialogProps
     refreshUsers();
   };
 
-  const handleCreate = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreate = async () => {
     const trimmed = newName.trim();
     if (trimmed.length === 0) {
       setError('请输入你的名字');
@@ -186,14 +197,17 @@ export function UserSelectDialog({ open, onUserSelected }: UserSelectDialogProps
       setError('名字最多8个字');
       return;
     }
-    // Check for duplicate names
-    if (users.some((u) => u.username === trimmed)) {
-      setError('这个名字已经被用了');
-      return;
-    }
 
-    createUser(trimmed);
-    onUserSelected();
+    setIsLoading(true);
+    try {
+      // loginUser creates on server if new, or fetches existing progress
+      await loginUser(trimmed);
+      onUserSelected();
+    } catch {
+      setError('连接失败，请重试');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!open) return null;

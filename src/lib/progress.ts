@@ -120,3 +120,25 @@ export function resetProgress(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(getStorageKey());
 }
+
+/**
+ * Sync current localStorage progress to the server.
+ * Fire-and-forget — doesn't block gameplay if server is unavailable.
+ */
+export function syncProgressToServer(): void {
+  if (typeof window === 'undefined') return;
+  const user = getCurrentUser();
+  if (!user) return;
+
+  const progress = getProgress();
+  fetch('/api/player/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: user.username,
+      progressData: progress,
+    }),
+  }).catch(() => {
+    // Silent fail — localStorage is the fallback
+  });
+}

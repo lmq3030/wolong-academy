@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLevelEngine } from '@/lib/engine/useLevelEngine';
 import { BattleScene } from '@/components/battle/BattleScene';
-import { saveChapterProgress, addXP, unlockGenerals, isChapterUnlocked, getProgress } from '@/lib/progress';
+import { saveChapterProgress, addXP, unlockGenerals, isChapterUnlocked, getProgress, syncProgressToServer } from '@/lib/progress';
 import { chapters as allChapters } from '@/lib/levels';
 import type { Chapter } from '@/lib/levels/types';
 
@@ -75,17 +75,8 @@ export function BattleClient({ chapter }: { chapter: Chapter }) {
         unlockGenerals(chapter.rewards.unlockGenerals);
       }
 
-      fetch('/api/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chapterId: chapter.id,
-          stars: engine.state.stars,
-          xpGained: chapter.rewards.xp,
-          unlockedGenerals: chapter.rewards.unlockGenerals,
-          unlockedItems: chapter.rewards.unlockItems,
-        }),
-      });
+      // Sync to server for cross-device persistence
+      syncProgressToServer();
       router.push('/map');
     } else {
       engine.nextPhase();
