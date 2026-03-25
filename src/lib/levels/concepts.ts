@@ -18,9 +18,10 @@ export const concepts: PythonConcept[] = [
     example: `# ← 井号开头的是"注释"，给人看的说明，Python 会忽略它
 # print() 是命令，括号里放要显示的内容
 # 文字要用引号包起来（告诉 Python 这是文字不是命令）
+# 每次 print 都会从新的一行开始输出
 print("天下英雄，使君与操耳")
 print("三顾茅庐")
-# 数字和算术不需要引号
+# 数字和算术不需要引号（+ 在数字间是加法）
 print(1 + 2)`,
     expectedOutput: `天下英雄，使君与操耳
 三顾茅庐
@@ -36,8 +37,10 @@ print(1 + 2)`,
     example: `# = 是"放进去"（赋值），不是数学的"等于"
 # 把"赵云"放进叫 hero 的盒子里
 hero = "赵云"
+# 可以建很多个变量，每个装不同的东西
 weapon = "龙胆亮银枪"
-# + 可以把多段文字拼在一起（叫"拼接"）
+# + 在文字间是"拼接"（把多段文字连在一起）
+# 注意：变量名不加引号，文字要加引号
 print(hero + "的武器是" + weapon)`,
     expectedOutput: `赵云的武器是龙胆亮银枪`,
     unlockedByChapter: 'chapter-01',
@@ -56,8 +59,8 @@ def war_cry(name):
     # 缩进（前面4个空格）= 这行在函数内部
     print(name + "在此，谁敢一战！")
 
-# 调用函数：函数名(参数值)
-# 每次传入不同的名字，输出就不同
+# 注意：上面只是"定义"，代码还没执行！
+# 调用函数：函数名(参数值)，这时才真正执行
 war_cry("张飞")
 war_cry("关羽")`,
     expectedOutput: `张飞在此，谁敢一战！
@@ -76,7 +79,7 @@ war_cry("关羽")`,
 # : = 冒号，后面缩进的代码在条件成立时执行
 if soldiers > 1000:
     print("正面迎战！")
-# else = "否则"，条件不成立时执行
+# else: = "否则"（也要冒号！必须和 if 对齐）
 else:
     print("使用空城计！")
 # 500 > 1000 是 False，所以走 else 分支`,
@@ -112,12 +115,13 @@ print(len(heroes))`,
 # : = 冒号，下面缩进的代码会重复执行
 for i in range(3):
     # 缩进 = 这行在循环内，每轮都执行
-    # 逗号隔开多个内容，Python 自动拼在一起输出
+    # 逗号隔开多个内容，Python 自动加空格拼在一起输出
+    # i+1 是因为 range 从0开始，显示要从1开始
     print("第", i + 1, "箭！")
 
 # 也可以逐个取出列表里的元素
 generals = ["赵云", "马超", "黄忠"]
-# g = 每轮取出的元素名（你自己起的名字）
+# g = 每轮取出的元素（这里 g 是文字，不是数字）
 for g in generals:
     print(g + "出击！")`,
     expectedOutput: `第 1 箭！
@@ -141,9 +145,10 @@ captures = 0
 # : = 冒号，下面缩进的代码是循环体
 while captures < 3:
     # += 是简写：captures += 1 等于 captures = captures + 1
+    # 这行非常重要！不更新 captures 就会死循环
     captures += 1
     print("第", captures, "次擒获孟获")
-# captures 变成 3，3 < 3 不成立，循环结束
+# 不缩进 = 这行在循环外面，循环结束后才执行
 print("孟获服了！")`,
     expectedOutput: `第 1 次擒获孟获
 第 2 次擒获孟获
@@ -172,7 +177,8 @@ print(name)  # 正确！用的是 name 而不是 nama`,
     name: '列表操作',
     threeKingdomsName: '草船借箭',
     description: 'append就像草船借箭，一批批地收集数据。',
-    example: `arrows = []
+    example: `# [] 不放任何元素 = 创建一个空列表
+arrows = []
 # .append() = 点号表示"对这个列表做操作"
 # append 往列表末尾添加一个元素
 arrows.append("第一批箭")
@@ -180,7 +186,8 @@ arrows.append("第二批箭")
 arrows.append("第三批箭")
 # 逗号隔开多个内容，Python 自动拼在一起输出
 print("共借到", len(arrows), "批箭")
-# .pop() 取出并删除最后一个元素
+# .pop() 取出并删除最后一个元素，并把它"返回"
+# 返回 = 把取出的值交给你，可以存进变量
 last = arrows.pop()
 print("取出:", last)
 print("还剩", len(arrows), "批箭")`,
@@ -201,6 +208,7 @@ print(message)
 # str() = 把数字变成文字（string 的缩写）
 # 文字和数字不能直接用 + 拼，要先用 str() 转换
 # len() = 数出有几个字符
+# str(len(message)) = 先算里面的 len 得到 4，再用 str 变成 "4"
 print("密信长度：" + str(len(message)))
 # [0] = 取第 0 个字符（编号从0开始，和列表一样）
 print("第一个字：" + message[0])`,
@@ -218,6 +226,7 @@ print("第一个字：" + message[0])`,
     example: `army = ["曹兵", "曹兵", "阿斗", "曹兵"]
 # enumerate() 同时给出编号 i 和内容 person
 # i = 位置编号（从0开始），person = 该位置的内容
+# 逗号隔开两个变量 = enumerate 每次给出两个值，分别存进 i 和 person
 for i, person in enumerate(army):
     # == 是"是否相等"的比较（不是赋值的 =）
     if person == "阿斗":
@@ -252,8 +261,9 @@ print(stack.pop())`,
     description: '队列就像排队过河：先来的先走。',
     example: `# from A import B = 从工具箱 A 里拿出工具 B
 # deque = 适合做队列的容器（比普通列表快）
+# collections 是 Python 自带的工具箱，不用安装
 from collections import deque
-# deque() 创建队列，和列表类似但专为队列优化
+# deque() 创建队列，传入一个列表来初始化内容
 queue = deque(["于禁", "庞德", "曹仁"])
 # .popleft() = 从队头取出（第一个来的先走）
 # 注意是 popleft 不是 pop（pop 取的是最后一个）
@@ -304,6 +314,8 @@ class City:
 # 用图纸造出一个对象：类名(参数)
 xicheng = City("西城")
 # 对象.方法() = 让这个对象执行方法
+# 虽然 show(self) 定义里有 self，但调用时不用传
+# Python 自动把 xicheng 传给 self
 xicheng.show()`,
     expectedOutput: `西城：城门大开`,
     unlockedByChapter: 'chapter-14',
@@ -320,8 +332,10 @@ class Supply:
         # 内部用字典 {} 存数据
         self.items = {}
     # 方法：添加物品（设置 键=物品名, 值=数量）
+    # 调用 cart.add("粮草", 100) 时，self=cart, name="粮草", qty=100
     def add(self, name, qty):
         # dict[key] = value 往字典里写入一对键值
+        # 注意：同名 key 会覆盖旧值，不是累加
         self.items[name] = qty
     # 方法：展示所有物品
     def show(self):
