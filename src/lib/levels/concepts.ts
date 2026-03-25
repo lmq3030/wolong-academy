@@ -185,6 +185,7 @@ arrows.append("第一批箭")
 arrows.append("第二批箭")
 arrows.append("第三批箭")
 # 逗号隔开多个内容，Python 自动拼在一起输出
+# len() 数出列表有几个元素
 print("共借到", len(arrows), "批箭")
 # .pop() 取出并删除最后一个元素，并把它"返回"
 # 返回 = 把取出的值交给你，可以存进变量
@@ -328,6 +329,7 @@ xicheng.show()`,
     description: '组合多种数据结构，就像诸葛亮发明木牛流马。',
     example: `# 用 class 组合字典，造出"补给车"
 class Supply:
+    # def = 定义方法（class 里的函数叫"方法"）
     def __init__(self):
         # 内部用字典 {} 存数据
         self.items = {}
@@ -340,7 +342,7 @@ class Supply:
     # 方法：展示所有物品
     def show(self):
         # .items() 取出字典里每一对(键, 值)
-        # k = key(键/物品名), v = value(值/数量)
+        # for 循环遍历每一对 k(键/物品名), v(值/数量)
         for k, v in self.items.items():
             # str(v) 把数字转成文字再拼接
             print(k + ": " + str(v))

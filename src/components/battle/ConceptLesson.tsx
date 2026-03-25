@@ -9,7 +9,7 @@ import { TTSButton } from '@/components/ui/TTSButton';
    Step data model — each step can contain ONE OR MORE content types
    that the renderer checks with 'key' in step.
    ────────────────────────────────────────────────────────────── */
-interface LessonStep {
+export interface LessonStep {
   title: string;
   subtitle?: string;
   // text content
@@ -285,7 +285,8 @@ function getTTSText(step: LessonStep, concept: PythonConcept): string {
    Each concept returns a tailored array of LessonSteps.
    Simple concepts: 2-3 steps. Complex concepts: 4-6 steps.
    ══════════════════════════════════════════════════════════════ */
-function getConceptSteps(concept: PythonConcept): LessonStep[] {
+/** Exported for testing — builds the step array for a given concept */
+export function getConceptSteps(concept: PythonConcept): LessonStep[] {
   const builder = conceptStepBuilders[concept.id];
   if (builder) return builder(concept);
 
