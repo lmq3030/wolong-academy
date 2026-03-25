@@ -55,6 +55,7 @@ export function BattleScene({
   const chapterConcept = concepts.find(c => c.unlockedByChapter === chapter.id);
   const [showExplain, setShowExplain] = React.useState(false);
   const [showRepl, setShowRepl] = React.useState(false);
+  const [showFullLesson, setShowFullLesson] = React.useState(false);
 
   // Auto-skip concept_intro if no concept for this chapter
   React.useEffect(() => {
@@ -240,18 +241,34 @@ export function BattleScene({
                   输出：{chapterConcept.expectedOutput}
                 </p>
               </div>
-              {/* Close */}
-              <button
-                onClick={() => setShowExplain(false)}
-                className="w-full py-2 text-sm font-bold cursor-pointer border-t"
-                style={{
-                  color: 'var(--color-bamboo)',
-                  borderColor: 'var(--color-bamboo)',
-                  fontFamily: 'serif',
-                }}
-              >
-                收起
-              </button>
+              {/* Actions */}
+              <div className="flex border-t" style={{ borderColor: 'var(--color-bamboo)' }}>
+                <button
+                  onClick={() => {
+                    setShowExplain(false);
+                    setShowFullLesson(true);
+                  }}
+                  className="flex-1 py-2 text-sm font-bold cursor-pointer"
+                  style={{
+                    color: 'white',
+                    backgroundColor: 'var(--color-shu-red)',
+                    fontFamily: 'serif',
+                  }}
+                >
+                  详细学习
+                </button>
+                <button
+                  onClick={() => setShowExplain(false)}
+                  className="flex-1 py-2 text-sm font-bold cursor-pointer border-l"
+                  style={{
+                    color: 'var(--color-bamboo)',
+                    borderColor: 'var(--color-bamboo)',
+                    fontFamily: 'serif',
+                  }}
+                >
+                  收起
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -311,6 +328,17 @@ export function BattleScene({
             rewards={rewards}
             stars={stars}
             onContinue={onNextPhase}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Full ConceptLesson overlay — triggered from explanation panel "详细学习" */}
+      <AnimatePresence>
+        {showFullLesson && chapterConcept && (
+          <ConceptLesson
+            concept={chapterConcept}
+            chapterTitle={chapter.title}
+            onReady={() => setShowFullLesson(false)}
           />
         )}
       </AnimatePresence>
