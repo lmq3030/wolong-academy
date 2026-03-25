@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { PythonConcept } from '@/lib/levels/concepts';
+import { ConceptLesson } from '@/components/battle/ConceptLesson';
 
 interface ConceptCardProps {
   concept: PythonConcept;
@@ -12,6 +13,7 @@ interface ConceptCardProps {
 export function ConceptCard({ concept, isUnlocked }: ConceptCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showLesson, setShowLesson] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -137,8 +139,36 @@ export function ConceptCard({ concept, isUnlocked }: ConceptCardProps) {
                   {concept.expectedOutput}
                 </pre>
               </div>
+
+              {/* Open detailed lesson button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowLesson(true);
+                }}
+                className="mt-3 w-full rounded-lg py-2 text-sm font-bold transition-colors cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--color-shu-red)',
+                  color: 'white',
+                  fontFamily: 'serif',
+                }}
+              >
+                详细学习
+              </button>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ConceptLesson overlay */}
+      <AnimatePresence>
+        {showLesson && (
+          <ConceptLesson
+            concept={concept}
+            chapterTitle="兵书阁"
+            onReady={() => setShowLesson(false)}
+          />
         )}
       </AnimatePresence>
     </motion.div>
