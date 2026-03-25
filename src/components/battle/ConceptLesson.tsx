@@ -315,11 +315,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-print': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要 print()?',
-      content: '写代码时，电脑不会自动告诉你结果——你必须命令它"说出来"。print() 就是这个命令：把括号里的东西显示到屏幕上。',
+      subtitle: '没有 print 会怎样？',
+      content: '看看这段代码——它算了 1+2，但运行后屏幕上什么都没有！',
+      code: '# 没有 print 的"笨办法"\n1 + 2\n"天下英雄，使君与操耳"\n# 运行后……屏幕上什么都没有！\n# Python 算了，但不告诉你结果',
       detail: [
-        '想象你是军师，写了一封密信。如果不派人送出去，谁也看不到。print() 就是"送信人"——把你的消息送到屏幕上。',
-        '没有 print()，代码会默默执行但你看不到任何结果。所以每当你想看到什么，就用 print() 把它"说出来"。',
+        '代码默默地执行了，但你什么都看不到。就像军师写了密信却没派人送出去——白写了！',
+        'print() 就是"送信人"——它能把括号里的内容显示到屏幕上，让你看到结果。',
       ],
     },
     {
@@ -349,11 +350,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-variables': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要变量？',
-      content: '如果你要多次用到"赵云"这个名字，每次都打字太麻烦了。变量就是给一个值起个名字，以后用名字就能代替它。',
+      subtitle: '没有变量的笨办法',
+      content: '如果没有变量，每次用到"赵云"都要重新写一遍。想换成"关羽"？要改好多处！',
+      code: '# 笨办法：到处写死名字\nprint("赵云的武器是龙胆亮银枪")\nprint("赵云出击！")\nprint("赵云大获全胜！")\n# 想换成关羽？要改 3 个地方！漏改一个就出 bug',
       detail: [
-        '变量就像一个有标签的盒子：你把"赵云"放进一个叫 hero 的盒子里，以后说 hero，Python 就知道你指的是"赵云"。',
-        '如果你改主意了，还可以换掉盒子里的内容：hero = "关羽"，现在 hero 变成了"关羽"。',
+        '如果名字出现了 100 次呢？改起来太痛苦了。而且很容易漏改，导致一半写"赵云"一半写"关羽"。',
+        '变量就是解决方案：把名字存进一个"盒子"，以后只用盒子的名字。换人？只改一处就够了！',
       ],
     },
     {
@@ -384,11 +386,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-functions': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要函数？',
-      content: '如果同样的代码要写好几遍（比如让不同武将喊战号），太浪费了。函数就是"写一次，用多次"的办法。',
+      subtitle: '没有函数的笨办法',
+      content: '想让 3 个武将喊战号？没有函数，你得复制粘贴同样的代码 3 次：',
+      code: '# 笨办法：复制粘贴 3 次\nprint("张飞" + "在此，谁敢一战！")\nprint("关羽" + "在此，谁敢一战！")\nprint("赵云" + "在此，谁敢一战！")\n# 要改战号？3 个地方都要改！',
       detail: [
-        '函数就像一本兵法手册：先写好步骤（"定义"），以后随时翻开来用（"调用"）。',
-        '你可以传入不同的"原料"（参数），每次得到不同的结果。同一套兵法，换个将军就能用！',
+        '如果有 10 个武将呢？复制 10 次！如果战号要改？每个都得改！',
+        '函数就是解决方案：把代码写成一套"兵法"，定义一次，传入不同的名字就能重复使用。',
       ],
     },
     {
@@ -418,11 +421,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-if-else': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要 if/else？',
-      content: '打仗不能只有一个方案——兵多就正面打，兵少就用计谋。程序也需要根据不同情况做不同的事，这就是 if/else。',
+      subtitle: '没有 if/else 的笨办法',
+      content: '没有 if/else，程序每次都只能做同一件事——不管敌人多少，都正面打：',
+      code: '# 笨办法：不管情况，永远正面冲\nprint("正面迎战！")\n# 如果只有 100 个兵呢？照样冲……全军覆没！\n# 我们需要让程序"看情况决定"',
       detail: [
-        'if/else 让程序学会"做判断"。就像军师看到敌情后，选择不同的策略。',
-        '生活中到处都是 if/else：如果下雨，带伞；否则不带。如果考了100分，奖励；否则继续加油。',
+        '没有判断能力的程序就像一个只会冲锋的莽夫——不管敌人 1 万还是 10 个，都傻冲。',
+        'if/else 让程序学会"做判断"：兵多就正面打，兵少就用计谋。就像军师看到敌情后选择策略。',
       ],
     },
     {
@@ -441,13 +445,26 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
       ],
     },
     {
+      title: '执行追踪',
+      subtitle: '不同的兵力，不同的结果',
+      content: '看看 Python 在不同兵力下怎么做判断：',
+      trace: {
+        headers: ['soldiers', 'soldiers > 1000 ?', '走哪条路？', '输出'],
+        rows: [
+          ['500', '500 > 1000 → False', 'else 分支', '使用空城计！'],
+          ['1500', '1500 > 1000 → True', 'if 分支', '正面迎战！'],
+          ['1000', '1000 > 1000 → False', 'else 分支', '使用空城计！'],
+        ],
+      },
+      detail: [
+        '注意第 3 行：1000 > 1000 是 False（不成立），因为 > 是"严格大于"，1000 并不大于 1000。如果想包含等于，用 >= （大于等于）。',
+      ],
+    },
+    {
       title: '看看代码怎么写',
       subtitle: '军师的示范',
       code: c.example,
       output: c.expectedOutput,
-      detail: [
-        'soldiers = 500，500 > 1000 不成立（False），所以跳过 if 下面的代码，执行 else 下面的 print。',
-      ],
     },
   ],
 
@@ -455,11 +472,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-lists': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要列表？',
-      content: '一个变量只能装一个东西。但如果你有一整支军队的名单呢？列表就是一个能装很多东西的大盒子，按顺序排好。',
+      subtitle: '没有列表的笨办法',
+      content: '想存 5 个武将的名字？没有列表，你得给每个人单独建一个变量：',
+      code: '# 笨办法：一个人一个变量\nhero1 = "刘备"\nhero2 = "关羽"\nhero3 = "张飞"\nhero4 = "赵云"\nhero5 = "马超"\n# 想数有几个人？手动数！想加人？再建 hero6！',
       detail: [
-        '变量是一个盒子装一个东西：hero = "赵云"。列表是一排盒子连在一起：heroes = ["刘备", "关羽", "张飞"]。',
-        '列表里的东西有顺序——第一个、第二个、第三个……你可以用编号找到任意一个。',
+        '5 个还好，100 个武将呢？hero1 到 hero100？而且你没法用循环遍历它们！',
+        '列表就是解决方案：一个变量装所有人，用编号就能找到任意一个，还能用 for 循环遍历。',
       ],
     },
     {
@@ -560,12 +578,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-while-loop': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: 'while 也是循环？和 for 有什么不同？',
-      content: '上一章学了 for 循环——适合"我明确知道要重复几次"的场景。但有时候你不知道要重复几次，只知道"到了某个条件就停"。这就是 while 循环！',
+      subtitle: 'for 循环搞不定的情况',
+      content: 'for 循环需要提前知道"重复几次"。但如果你不知道要重复几次呢？',
+      code: '# 笨办法：不知道要擒几次，只能用 for 猜一个数\nfor i in range(10):  # 猜 10 次？也许 3 次就够了\n    print("擒获孟获！")\n# 问题：多跑了 7 次！或者猜少了，不够用',
       detail: [
-        'for 循环像"点名"：按名单一个一个来，名单上有几个人就执行几次。',
-        'while 循环像"守城"：一直守着，直到敌人撤退（条件不满足）才停下来。你不知道敌人什么时候撤，但你知道撤了就停。',
-        '它们的共同点：都是让代码重复执行。区别在于"什么时候停"。',
+        'for 循环像"点名"：名单上几个人就执行几次。但如果你不知道名单有多长呢？',
+        'while 循环就是解决方案：不用猜次数，只需要说"条件满足就继续，不满足就停"。就像守城——一直守到敌人撤退为止。',
       ],
     },
     {
@@ -630,11 +648,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-debug': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '什么是 bug？为什么叫"虫子"？',
-      content: '程序员写的代码有错误，就叫"bug"（虫子）。这个词来自早期电脑——一只真的虫子卡在电路里导致故障！找出并修复 bug 的过程叫"debug"（除虫）。',
+      subtitle: '没有 debug 的笨办法',
+      content: '代码出错了怎么办？没有调试技巧，你只能瞎猜、随便改，改了可能更糟：',
+      code: '# 笨办法：瞎猜哪里错了\nname = "关羽"\nprint(nama)  # 报错了！\n# 随便改……把 print 改成 prnt？\n# 越改越乱！不如学会"看报错信息"',
       detail: [
-        '就像华佗刮骨疗毒：先找到"毒"在哪里（bug 在哪行），再对症下药（修复代码）。',
-        '每个程序员都会写出 bug，这很正常！重要的是学会"找"和"修"。',
+        '瞎猜就像蒙着眼睛治病——可能治好，但更可能治坏。',
+        'Debug 就是解决方案：学会看 Python 的"报错信息"（就像医生的诊断书），精准定位 bug 在哪，对症下药。',
       ],
     },
     {
@@ -667,11 +686,11 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-list-ops': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '列表创建后还能改吗？',
-      content: '当然能！列表不是写死的——你可以往里面添加、取出、甚至删除元素，就像点将册可以随时更新。',
+      subtitle: '没有列表操作的笨办法',
+      content: '想往名单里加一个人？没有 append，你得重新创建整个列表：',
+      code: '# 笨办法：加个人要重写整个列表\narrows = ["第一批箭", "第二批箭"]\n# 想加第三批？重新写一遍：\narrows = ["第一批箭", "第二批箭", "第三批箭"]\n# 每次加/删都要重写，太累了！',
       detail: [
-        '之前学的 append() 是"添加"。这一章还会学 pop()（取出）和 len()（数数）。',
-        '这三个操作是列表最常用的，几乎每个程序都会用到。',
+        '列表操作就是解决方案：append() 往末尾加、pop() 从末尾取、len() 数有几个——不用每次重建！',
       ],
     },
     {
@@ -699,8 +718,17 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-strings': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '什么是"字符串"？',
-      content: '字符串就是一串文字。你之前用 print("你好") 时，引号里的"你好"就是一个字符串。这一章学习对文字做更多操作。',
+      subtitle: '没有字符串操作的笨办法',
+      content: '想把两段话拼起来？想知道密信有多长？没有字符串操作，你只能手动数、手动拼：',
+      code: '# 笨办法：手动拼接和计算\nprint("火攻曹营")  # 想加前缀？重写整句\nprint("密信长度：4")  # 手动数了4个字\nprint("第一个字：火")  # 手动找的\n# 如果内容变了，全都要重来！',
+      detail: [
+        '字符串操作就是解决方案：+ 拼接、len() 自动数长度、[0] 自动取第一个字——让 Python 帮你处理文字！',
+      ],
+    },
+    {
+      title: '什么是"字符串"？',
+      subtitle: '一串文字的正式名称',
+      content: '字符串就是一串文字。你之前用 print("你好") 时，引号里的"你好"就是一个字符串。',
       detail: [
         '为什么叫"字符串"？因为它就是一个个"字符"像串珠子一样串在一起的。"火攻曹营" 是 1 个字符串，由 4 个字符组成。',
         '字符串用引号包起来。单引号 \'你好\' 和双引号 "你好" 效果一样，选哪个都行。',
@@ -727,11 +755,11 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-search': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '什么是"搜索"？',
-      content: '搜索就是在一堆数据中找到你要的那一个——就像赵云在百万军中寻找阿斗。最基本的方法是"逐个查找"。',
+      subtitle: '没有搜索的笨办法',
+      content: '想在军队里找阿斗？没有搜索，你得一个一个手动检查：',
+      code: '# 笨办法：手动检查每个位置\narmy = ["曹兵", "曹兵", "阿斗", "曹兵"]\nif army[0] == "阿斗": print("在位置0")\nif army[1] == "阿斗": print("在位置1")\nif army[2] == "阿斗": print("在位置2")\nif army[3] == "阿斗": print("在位置3")\n# 100个人？写100行 if！',
       detail: [
-        '逐个查找的思路很简单：从列表第一个元素开始，一个一个看，看到目标就停下来。',
-        '你已经学会了 for 循环和 if 条件，把它们组合起来就是搜索！',
+        '搜索就是解决方案：用 for 循环自动遍历每个人，用 if 自动判断是不是目标。两三行搞定！',
       ],
     },
     {
@@ -775,11 +803,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-stack': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '什么是"栈"？为什么需要它？',
-      content: '想象你在叠盘子：最后放上去的盘子在最上面，所以最先被拿走。栈就是这样一种数据结构——"后进先出"。',
+      subtitle: '没有栈的笨办法',
+      content: '用普通列表也能"后进先出"，但你得自己记住"只从末尾操作"——一不小心就搞混了：',
+      code: '# 笨办法：用列表但容易出错\nlayers = ["第一层", "第二层", "第三层"]\nlast = layers[2]  # 手动记住最后一个是 [2]\nlayers.pop(0)  # 手滑从开头取了！顺序全乱了',
       detail: [
-        '英文叫 Stack，像一摞叠起来的东西。你只能从最上面放东西（push）或拿东西（pop），不能从中间抽。',
-        '生活中的栈：浏览器的"后退"按钮——你访问了 A→B→C，点后退先回到 B，再点回到 A。最后访问的最先回退。',
+        '栈就是"后进先出"的规则：只能从最上面放和取。就像叠盘子、叠积木——最后放上去的最先拿走，绝不能从中间抽。',
+        '浏览器的"后退"按钮就是栈：访问 A→B→C，后退先回到 B，再回到 A。',
       ],
     },
     {
@@ -815,11 +844,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-queue': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '什么是"队列"？和栈有什么不同？',
-      content: '队列就像排队买饭：先来的先服务，后来的排在后面等。这叫"先进先出"——和栈正好相反！',
+      subtitle: '没有队列的笨办法',
+      content: '想实现"先来先走"？用普通列表的 pop(0) 可以，但很慢：',
+      code: '# 笨办法：用列表的 pop(0)\nline = ["于禁", "庞德", "曹仁"]\nfirst = line.pop(0)  # 取出于禁\n# 问题：pop(0)后，庞德和曹仁都要往前挪一位\n# 队伍很长时，每次取人都要全员前移——太慢了！',
       detail: [
-        '栈是"后进先出"（像叠盘子），队列是"先进先出"（像排队）。',
-        '生活中的队列：排队买票、打印机任务队列（先发送的先打印）、消息排队发送。',
+        '队列（deque）就是解决方案：popleft() 直接从队头取出，不需要其他人挪位——又快又正确！',
+        '队列是"先进先出"（像排队买饭），和栈的"后进先出"正好相反。',
       ],
     },
     {
@@ -869,11 +899,12 @@ const conceptStepBuilders: Record<string, (c: PythonConcept) => LessonStep[]> = 
   'concept-dict': (c) => [
     {
       title: `兵书：${c.threeKingdomsName}`,
-      subtitle: '为什么需要字典？',
-      content: '列表用编号（0,1,2...）找东西。但如果你想用"名字"来找呢？比如你想说"第一计是什么"，而不是"编号0是什么"。字典就是为此而生。',
+      subtitle: '没有字典的笨办法',
+      content: '想按名字查找计策？没有字典，你得写一堆 if/elif：',
+      code: '# 笨办法：用 if/elif 逐个判断\nname = "第一计"\nif name == "第一计":\n    print("联吴抗曹")\nelif name == "第二计":\n    print("火烧赤壁")\nelif name == "第三计":\n    print("草船借箭")\n# 100 条计策？写 100 个 elif！',
       detail: [
-        '列表像点将册：第 0 个是关羽，第 1 个是张飞。你必须记住编号。',
-        '字典像锦囊：每个锦囊有名字（"第一计"），打开就是内容（"联吴抗曹"）。用名字找比用编号直观多了！',
+        '计策越多，if/elif 越长。而且查找速度也慢——Python 要从第一个 if 开始，一个一个比对。',
+        '字典就是解决方案：用"名字"直接找到内容，一步到位，不需要一个个比对！',
       ],
     },
     {

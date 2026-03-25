@@ -76,3 +76,70 @@ Doubao (豆包) TTS via `/api/tts` route. Requires `DOUBAO_APP_ID` and `DOUBAO_A
 ## Test Conventions
 
 Tests are colocated in `__tests__/` folders next to their modules. Use `vitest` with `jsdom` environment. Path alias `@/` resolves to `src/`.
+
+## Concept Teaching Design Principles
+
+The target learner is an **8-9 year old native English speaker** at an international school. Zero programming experience. Every concept must be taught from first principles.
+
+### Core Pedagogy: "Naive Method First"
+
+Every programming concept is an optimization over a "dumb" approach. **Always show the naive/brute-force approach BEFORE introducing the concept.** This lets the child feel the pain point, then appreciate the solution.
+
+| Concept | Show This First (笨办法) | Then Introduce |
+|---------|-------------------------|----------------|
+| Variables | Hardcoding "赵云" in 10 places, changing one means changing all 10 | `hero = "赵云"` — change once |
+| Functions | Copy-paste same 3 lines for each general | `def war_cry(name):` — write once, call many |
+| if/else | Code that always does the same thing regardless of situation | Branching based on condition |
+| Lists | `hero1`, `hero2`, `hero3`... separate variables per item | `heroes = [...]` — one container |
+| for loop | 5 identical `print()` statements | `for i in range(5):` |
+| while loop | Using for with a guessed count | `while condition:` — stop when condition is met |
+| Dict | Long if/elif chain to look up by name | `plans["第一计"]` — direct key lookup |
+| Stack/Queue | Plain list where you accidentally operate from wrong end | Enforced LIFO/FIFO discipline |
+
+### Multi-Step Lesson Structure (ConceptLesson)
+
+Complex concepts use **4-6 steps** (not just 2). The `conceptStepBuilders` in `ConceptLesson.tsx` defines custom step sequences per concept:
+
+1. **Naive method** (笨办法) — show the problem with concrete code
+2. **Why this concept** — motivation and analogy
+3. **Keyword breakdown** (逐词拆解) — explain every keyword and symbol
+4. **Execution trace** — table showing variable values at each step
+5. **Code example** — complete working code with output
+6. (Optional) **Visual diagram** — AI-generated illustration
+
+### Step Types Supported
+
+Each step can contain one or more of:
+- `content` + `detail[]` — text explanation paragraphs
+- `breakdown[]` — `{code, label}` pairs for keyword-by-keyword breakdown
+- `trace` — `{headers[], rows[][]}` execution trace table
+- `code` + `output` — runnable code example with expected output
+- `image` + `imageCaption` — visual diagram (stored in `/public/assets/concepts/`)
+
+### No Hidden Assumptions
+
+**Every concept/symbol must be explicitly taught before use.** Known assumptions that have been addressed:
+- **Indentation**: What it is, Tab key, why 4 spaces (taught in functions, first concept to use it)
+- **# comments**: Explained in print (first concept)
+- **Dot syntax** `.method()`: Explained when lists introduce `.append()`
+- **print comma syntax**: Explained in for-loop (逗号分隔多个参数)
+- **True/False (boolean)**: Explained in if/else breakdown
+- **str() type conversion**: Explained with error example in strings
+- **Colon `:` rule**: Explained in each concept that uses it (functions, if, for, while, class)
+- **`import`**: Explained in queue (first concept to use it)
+
+### Visual Diagrams
+
+Generated with Gemini via NanoBanana, stored in `public/assets/concepts/`:
+- `for-loop-flow.png` — Step-by-step execution flowchart
+- `for-vs-while.png` — Side-by-side comparison diagram
+- `range-generator.png` — Conveyor belt visualization of range()
+
+### Research-Backed Practices
+
+Based on analysis of Code.org, Scratch, Khan Academy, and Chinese platforms:
+- **Body/physical metaphor first, syntax last** — real-world analogy before code
+- **Unroll before abstracting** — show verbose version, then compress into abstraction
+- **Execution traces > flowcharts** for ages 8-9 (simplified 2-3 column tables)
+- **Visual enclosure** — indented code should feel "inside" the loop/function
+- **Immediate visual output** — each iteration should produce a visible result
